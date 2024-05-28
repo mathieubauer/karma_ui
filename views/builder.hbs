@@ -1,0 +1,102 @@
+<div id="page" class="vh-100 vw-100 p-4">
+
+    <button type="button" id="requestQuestion" class="btn btn-primary start m-3 p-2 text-uppercase fw-bold">Start A</button>  
+
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            background-color: white;
+            color: black;
+            font-size: 20px;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+
+    <table border="1" id="tableau">
+        <tr>
+            <td id="question"></td>
+            <td id="answer"></td>
+        </tr>
+    </table>
+    <button onclick="copierTableau()">Copier le tableau</button>
+
+    <script>
+        function copierTableau () {
+                // Sélectionner le tableau
+                var tableau = document.getElementById('tableau')
+                var lignes = tableau.getElementsByTagName('tr')
+                var texteBrut = ''
+
+                for (var i = 0; i < lignes.length; i++) {
+                    var cellules = lignes[ i ].getElementsByTagName('td')
+                    for (var j = 0; j < cellules.length; j++) {
+                        texteBrut += cellules[ j ].innerText
+                        if (j < cellules.length - 1) {
+                            texteBrut += '\t' // Ajouter une tabulation entre les colonnes
+                        }
+                    }
+                    texteBrut += '\n' // Ajouter un retour à la ligne à la fin de chaque ligne
+                }
+
+                // Copier le texte brut dans le presse-papier
+                var textarea = document.createElement('textarea')
+                textarea.value = texteBrut
+                document.body.appendChild(textarea)
+                textarea.select()
+                try {
+                    var reussi = document.execCommand('copy')
+                    if (reussi) {
+                        console.log('Le tableau a été copié dans le presse-papier.')
+                    } else {
+                        alert('Échec de la copie du tableau.')
+                    }
+                } catch (err) {
+                    alert('Erreur lors de la tentative de copie : ' + err)
+                }
+                document.body.removeChild(textarea)
+            }
+    </script>
+
+    
+    {{!-- <div id="question"></div>
+    <div id="answer"></div> --}}
+    <div id="text"></div>
+    <div id="timer"></div>
+
+    <button type="button" id="pop" class="btn btn-outline-secondary category m-3 p-2 text-uppercase fw-bold">
+        Pop culture
+    </button>
+    <button type="button" id="vie" class="btn btn-outline-secondary category m-3 p-2 text-uppercase fw-bold">
+        Vie quotidienne
+    </button>
+    <button type="button" id="mon" class="btn btn-outline-secondary category m-3 p-2 text-uppercase fw-bold">
+        Connaissance du monde
+    </button>
+    <button type="button" id="aca" class="btn btn-outline-secondary category m-3 p-2 text-uppercase fw-bold">
+        Savoirs académiques
+    </button>
+
+    <div>
+        <p>G : Générique</p>
+        <p>L : Quand il n'y a plus de temps</p>
+        <p>SPACEBAR : bed suspense</p>
+        <p>BACKSPACE : buzz</p>
+    </div>
+
+
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/builder.js"></script>

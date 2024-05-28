@@ -1,0 +1,153 @@
+<style>
+    .btn {
+        border-radius: 999px;
+        width: 180px;
+        font-family: var(--bs-font-monospace) !important;
+    }
+    .btn.category {
+        height: 80px;
+        font-family: var(--bs-font-monospace) !important;
+    }
+    #question-container {
+        min-height: 130px;
+    }
+</style>
+
+<div id="page" class="container-fluid p-5 vh-100 vw-100 text-center">
+
+    <p>
+        192.168.1.38:3001/player
+    </p>
+
+    <p>
+        Bienvenue dans Karma ! <br>
+        Nous sommes aujourd’hui mardi et nous retrouvons nos 11 concurrents. <br>
+        Hier, ils ont été particulièrement loyaux. <br>
+        Ce soir, les enjeux augmentent, ils jouent pour une cagnotte de 8 000 € <br>
+        Cette somme va-t-elle attiser les convoitises ? Nous allons le découvrir ce soir ! 
+    </p>
+
+    <p>
+        Concurrents, vous allez devoir éviter les éliminations pour espérer emporter la cagnotte. <br>
+        Il y a bien des façons d’être éliminés dans Karma, mais soyez sans crainte car même en cas de défaite, vous reviendrez
+        tous, chaque jour, jusqu’à vendredi. <br>
+        Xavier, 425 €. État d'esprit. <br>
+        Faustine, 650 €. Place de leader. <br>
+        Valérie, rien. Jouer différemment ? <br>
+        Sans plus attendre, commençons avec la première manche. STING
+    </p>
+
+    <p>
+        Concurrents, dans cette manche je vous poser à tous des questions de culture générale. Le ou la plus rapide à répondre
+        marquera un point. <br>
+        Dès qu’un candidat obtient deux points, il gagne le droit de choisir un allié. <br>
+        Le duo ainsi constitué est alors qualifié pour la manche suivante. <br>
+        Celui ou celle qui restera seul à la fin de la manche sera éliminé. <br>
+        Allumons les buzzers (round1), voici la première question.
+    </p>
+
+    <button type="button" id="requestQuestion" class="btn btn-secondary start m-3 p-2 text-uppercase fw-bold">Question !</button>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        table,
+        th,
+        td {
+            font-size: 20px;
+        }
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+    <table border="1" id="tableau" class="table mb-4">
+        <tr>
+            <td id="questionRand"></td>
+            <td id="answerRand"></td>
+        </tr>
+    </table>
+
+    <p>
+        STING. Concurrents, dans cette manche vos duos vont s’affronter deux à deux. Lors de chaque affrontement, les perdants seront
+        éliminés. Le dernier duo en lice remportera la somme de 2 000 € à partager. <br>
+        Pour savoir qui va s’affronter, je vais activer les buzzers pendant 8 secondes. Il vous suffira d’appuyer pour lancer le
+        défi au duo de votre choix. <br>
+        Bien sûr, vous préféreriez tous attendre tranquillement que les autres s’entre éliminent… mais sachez que si personne ne
+        lance de défi, un joueur au hasard sera immédiatement éliminé. <br>
+        Soyez attentifs, les buzzers vont s'allumer. (defi)
+    </p>
+
+    <p>
+        Joueur et Joueur, je vais vous poser cinq questions et vous devrez me donner un maximum de bonnes réponses. Vous pouvez
+        vous concerter, je prendrai la première réponse que vous énoncerez haut et fort. <br>
+        Si vous passez ou que vous n’avez pas la bonne réponse. Vos adversaires peuvent immédiatement tenter de répondre pour
+        vous voler le point. <br>
+        Vous avez 45 secondes pour répondre aux cinq questions. 
+        Ensuite ce sera au tour de vos adversaires. <br>
+        Vous avez lancé le défi, c’est vous qui allez choisir le thème de cet affrontement.
+
+        Je vous écoute.
+
+    </p>
+
+    <hr>
+
+        <button type="button" id="pop" class="btn btn-outline-secondary category m-3 p-2 text-uppercase fw-bold">
+            Pop culture
+        </button>
+        <button type="button" id="vie" class="btn btn-outline-secondary category m-3 p-2 text-uppercase fw-bold">
+            Vie quotidienne
+        </button>
+        <button type="button" id="mon" class="btn btn-outline-secondary category m-3 p-2 text-uppercase fw-bold">
+            Connaissance du monde
+        </button>
+        <button type="button" id="aca" class="btn btn-outline-secondary category m-3 p-2 text-uppercase fw-bold">
+            Savoirs académiques
+        </button>
+        
+        <hr>
+
+    <button type="button" id="startA" class="btn btn-primary start m-3 p-2 text-uppercase fw-bold">Start A</button>
+    <button type="button" id="startB" class="btn btn-primary start m-3 p-2 text-uppercase fw-bold">Start B</button>
+    <button type="button" id="draw" class="btn btn-secondary m-3 p-2 text-uppercase fw-bold">draw</button>
+    {{!-- <button type="button" id="pause" class="btn btn-primary m-3 p-2 text-uppercase fw-bold">Pause</button> --}}
+    <button type="button" id="reset" class="btn btn-outline-danger m-3 p-2 text-uppercase fw-bold">Reset time</button>
+
+    <hr>
+
+    <div id="question-container">
+        <div id="question" class="mb-3 fw-bold fs-3"></div>
+        <div id="answer" class="mb-3 fw-bold"></div>
+    </div>
+
+    <button type="button" id="right" class="btn btn-success decision m-3 p-2 text-uppercase fw-bold">Correct</button>
+    <button type="button" id="wrong" class="btn btn-danger decision m-3 p-2 text-uppercase fw-bold">Incorrect</button>
+    <button type="button" id="steal" class="btn btn-warning decision m-3 p-2 text-uppercase fw-bold">Vol</button>
+
+    {{!-- <hr>
+
+    <div id="score-container" class="font-monospace text-center d-flex">
+        <div id="teamA" class="fw-bold fs-3 col-6">
+            Équipe A
+            <div class="score d-flex justify-content-center"></div>
+        </div>
+        <div id="teamB" class="fw-bold fs-3 col-6">
+            Équipe B 
+            <div class="score d-flex justify-content-center"></div>
+        </div>
+    </div> --}}
+
+
+    <hr>
+
+        <button type="button" id="resetScore" class="btn btn-outline-danger m-3 p-2 text-uppercase fw-bold">Reset score</button>
+
+</div>
+
+{{!-- appendChrono & scores vient après, à modifier --}}
+{{!-- ou alors on append tout en JS ? --}}
+
+<script src="/socket.io/socket.io.js"></script>
+<script type="module" src="/js/host.js"></script>
