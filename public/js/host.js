@@ -1,9 +1,12 @@
-import { buildScoreBoard, updateScores } from './components/score.js'
-import { buildCountdown, startCountdown, pauseCountdown } from './components/countdown.js'
+import socket from "./components/socket.js"
+import { buildScoreBoard, updateScores } from "./components/score.js"
+import {
+    buildCountdown,
+    startCountdown,
+    pauseCountdown,
+} from "./components/countdown.js"
 
-const socket = io()
-
-socket.on('chronoUpdate', ({ endTime, isRunning }) => {
+socket.on("chronoUpdate", ({ endTime, isRunning }) => {
     if (isRunning) {
         startCountdown(endTime)
     } else {
@@ -11,93 +14,89 @@ socket.on('chronoUpdate', ({ endTime, isRunning }) => {
     }
 })
 
-socket.on('teamUpdate', ({ activeTeam }) => {
-    document.querySelectorAll('.start').forEach(button => {
-        button.classList.remove('btn-outline-primary')
-        button.classList.remove('btn-primary')
+socket.on("teamUpdate", ({ activeTeam }) => {
+    document.querySelectorAll(".start").forEach((button) => {
+        button.classList.remove("btn-outline-primary")
+        button.classList.remove("btn-primary")
     })
-    if (activeTeam == 'A') {
-        document.querySelector('#startA').classList.add('btn-primary')
-        document.querySelector('#startB').classList.add('btn-outline-primary')
+    if (activeTeam == "A") {
+        document.querySelector("#startA").classList.add("btn-primary")
+        document.querySelector("#startB").classList.add("btn-outline-primary")
     }
-    if (activeTeam == 'B') {
-        document.querySelector('#startA').classList.add('btn-outline-primary')
-        document.querySelector('#startB').classList.add('btn-primary')
+    if (activeTeam == "B") {
+        document.querySelector("#startA").classList.add("btn-outline-primary")
+        document.querySelector("#startB").classList.add("btn-primary")
     }
     if (activeTeam == null) {
-        document.querySelector('#startA').classList.add('btn-primary')
-        document.querySelector('#startB').classList.add('btn-primary')
+        document.querySelector("#startA").classList.add("btn-primary")
+        document.querySelector("#startB").classList.add("btn-primary")
     }
 })
 
-socket.on('questionUpdate', ({ question }) => {
+socket.on("questionUpdate", ({ question }) => {
     if (question) {
-        document.querySelector('#question').innerHTML = question.question
-        document.querySelector('#answer').innerHTML = question.answer
+        document.querySelector("#question").innerHTML = question.question
+        document.querySelector("#answer").innerHTML = question.answer
     } else {
-        document.querySelector('#question').innerHTML = ''
-        document.querySelector('#answer').innerHTML = ''
+        document.querySelector("#question").innerHTML = ""
+        document.querySelector("#answer").innerHTML = ""
     }
 })
 
-socket.on('scoreUpdate', ({ scores }) => {
+socket.on("scoreUpdate", ({ scores }) => {
     updateScores(scores)
 })
 
-socket.on('displayError', ({ error }) => {
-    document.querySelector('#question').innerHTML = error
+socket.on("displayError", ({ error }) => {
+    document.querySelector("#question").innerHTML = error
 })
 
-socket.on('displayCategory', ({ category }) => {
-
-    document.querySelectorAll('.category').forEach(button => {
-        button.classList.remove('btn-secondary')
-        button.classList.remove('btn-outline-secondary')
+socket.on("displayCategory", ({ category }) => {
+    document.querySelectorAll(".category").forEach((button) => {
+        button.classList.remove("btn-secondary")
+        button.classList.remove("btn-outline-secondary")
 
         if (button.id == category) {
-            button.classList.add('btn-secondary')
+            button.classList.add("btn-secondary")
         } else {
-            button.classList.add('btn-outline-secondary')
+            button.classList.add("btn-outline-secondary")
         }
-
     })
-
 })
-
 
 // LISTENERS
 
-document.querySelectorAll('.start').forEach(button => {
-    button.addEventListener('click', (event) => {
+document.querySelectorAll(".start").forEach((button) => {
+    button.addEventListener("click", (event) => {
         const startTeam = event.target.id
-        socket.emit('start', { startTeam })
+        socket.emit("start", { startTeam })
     })
 })
 
-document.querySelector('#draw').addEventListener('click', () => {
-    socket.emit('draw')
+document.querySelector("#draw").addEventListener("click", () => {
+    socket.emit("draw")
 })
 
-document.getElementById('reset').addEventListener('click', () => {
-    socket.emit('reset')
+document.getElementById("reset").addEventListener("click", () => {
+    socket.emit("reset")
 })
 
-document.getElementById('resetScore').addEventListener('click', () => {
-    socket.emit('resetScore')
+document.getElementById("resetScore").addEventListener("click", () => {
+    socket.emit("resetScore")
 })
 
-document.querySelectorAll('.decision').forEach(button => {
-    button.addEventListener('click', (event) => {
+document.querySelectorAll(".decision").forEach((button) => {
+    button.addEventListener("click", (event) => {
         const decision = event.target.id
-        socket.emit('decision', { decision })
+        socket.emit("decision", { decision })
     })
 })
 
-document.querySelectorAll('.category').forEach(button => {
-    button.addEventListener('click', (event) => {
+document.querySelectorAll(".category").forEach((button) => {
+    button.addEventListener("click", (event) => {
         const newCategory = event.target.id
         // socket.emit('questionRequest', { questionCategory })
-        socket.emit('category', { newCategory })
+        socket.emit("category", { newCategory })
     })
 })
 
@@ -117,13 +116,13 @@ document.querySelectorAll('.category').forEach(button => {
 
 //
 
-document.querySelector('#requestQuestion').addEventListener('click', () => {
-    socket.emit('requestQuestion')
+document.querySelector("#requestQuestion").addEventListener("click", () => {
+    socket.emit("requestQuestion")
 })
 
-socket.on('receiveQuestion', ({ question }) => {
-    document.querySelector('#questionRand').innerHTML = question.question
-    document.querySelector('#answerRand').innerHTML = question.answer
+socket.on("receiveQuestion", ({ question }) => {
+    document.querySelector("#questionRand").innerHTML = question.question
+    document.querySelector("#answerRand").innerHTML = question.answer
 })
 
 // ONLOAD
@@ -131,7 +130,7 @@ socket.on('receiveQuestion', ({ question }) => {
 buildCountdown()
 buildScoreBoard()
 
-//
+// ########## Gestion du son ##########
 
 let distance
 let startTime
@@ -145,18 +144,16 @@ audioBed.volume = 0.4
 
 window.addEventListener("keydown", handleKeyDown, true)
 
-
-function handleKeyDown (event) {
-
+function handleKeyDown(event) {
     console.log(state)
 
-    let letter = ''
+    let letter = ""
     let audio
 
-    if (event.type == 'click') {
+    if (event.type == "click") {
         letter = event.target.id.toUpperCase()
         event.target.blur()
-    } else if (event.type == 'keydown') {
+    } else if (event.type == "keydown") {
         letter = event.key.toUpperCase()
     }
 
@@ -186,7 +183,7 @@ function handleKeyDown (event) {
             startTimer(3000)
         }
         if (letter == "B") {
-            console.log('object')
+            console.log("object")
             const audio = new Audio("../sound/correct.m4a").play()
             // startTimer(3000)
         }
@@ -200,8 +197,6 @@ function handleKeyDown (event) {
         //     startTimer(3000)
         // }
     }
-
-
 
     // CORRECT
     if (letter == "Z") {
@@ -218,7 +213,6 @@ function handleKeyDown (event) {
         const audio = new Audio("../sound/time.m4a").play()
         stopTimer()
     }
-
 
     if (letter == "BACKSPACE") {
         console.log("hey")
@@ -265,17 +259,12 @@ function handleKeyDown (event) {
     if (letter == "ENTER") {
         console.log("uh")
     }
-
 }
-
-
-
-
 
 // variable to store our intervalID
 let nIntervId
 
-function startTimer (newDelay) {
+function startTimer(newDelay) {
     startTime = new Date().getTime()
     state = "BUZZED"
     delay = newDelay
@@ -286,18 +275,18 @@ function startTimer (newDelay) {
     }
 }
 
-function displayTimer () {
+function displayTimer() {
     const now = new Date().getTime()
     distance = now - startTime
     // var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
     // var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
     var seconds = Math.floor((distance % (1000 * 60)) / 1000)
-    var centiseconds = Math.floor((distance % (1000)) / 10)
+    var centiseconds = Math.floor((distance % 1000) / 10)
     seconds = seconds < 10 ? "0" + seconds : seconds
     centiseconds = centiseconds < 10 ? "0" + centiseconds : centiseconds
 }
 
-function stopTimer () {
+function stopTimer() {
     state = "IDLE"
     clearInterval(nIntervId)
     // release our intervalID from the variable

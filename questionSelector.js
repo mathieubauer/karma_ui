@@ -2,7 +2,9 @@ const categoryMap = {
     pop: 'Pop culture, loisirs et sports',
     vie: 'Vie quotidienne',
     mon: 'Connaissance du monde',
-    aca: 'Savoirs académiques'
+    aca: 'Savoirs académiques',
+    fin: 'Finale',
+    eli: 'Éliminatoire',
 }
 
 const questionSelector = (questions, category = null, count = 5) => {

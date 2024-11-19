@@ -1,0 +1,11 @@
+<!-- Logo Ampli -->
+<svg id="favicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+    <defs>
+        <style>.cls-1{fill:#ed781e;}.cls-1,.cls-2,.cls-3,.cls-4,.cls-5{stroke-width:0px;}.cls-2{fill:#44a3db;}.cls-3{fill:#2662ad;}.cls-4{fill:#fec90b;}.cls-5{fill:#79c2be;}</style>
+    </defs>
+    <rect class="cls-1" x="154.84" y="63.12" width="16.82" height="67.16" rx="8.41" ry="8.41"/>
+    <rect class="cls-3" x="20.34" y="63.12" width="16.82" height="67.16" rx="8.41" ry="8.41"/>
+    <rect class="cls-2" x="53.97" y="63.12" width="16.82" height="67.16" rx="8.41" ry="8.41"/>
+    <rect class="cls-5" x="87.59" y="63.12" width="16.82" height="113.57" rx="8.41" ry="8.41"/>
+    <rect class="cls-4" x="121.21" y="15.31" width="16.82" height="114.96" rx="8.41" ry="8.41"/>
+</svg>

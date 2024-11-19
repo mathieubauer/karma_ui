@@ -1,43 +1,40 @@
-const socket = io()
+import socket from "./components/socket"
 
 let myQuestion
 const myQuestionsSet = new Set()
 
-document.querySelector('#requestQuestion').addEventListener('click', () => {
-    socket.emit('requestQuestion')
+document.querySelector("#requestQuestion").addEventListener("click", () => {
+    socket.emit("requestQuestion")
 })
 
-socket.on('receiveQuestion', ({ question }) => {
+socket.on("receiveQuestion", ({ question }) => {
     myQuestion = question
-    document.querySelector('#question').innerHTML = question.question
-    document.querySelector('#answer').innerHTML = question.answer
+    document.querySelector("#question").innerHTML = question.question
+    document.querySelector("#answer").innerHTML = question.answer
 })
 
 /////
 
-document.querySelectorAll('.category').forEach(button => {
-    button.addEventListener('click', (event) => {
+document.querySelectorAll(".category").forEach((button) => {
+    button.addEventListener("click", (event) => {
         const decision = event.target.id
         if (decision == "aca") {
-
             if (myQuestion && !myQuestionsSet.has(myQuestion.question)) {
-                        myQuestionsSet.add(myQuestion.question);
-                        console.log(Array.from(myQuestionsSet));
-                    }
-
+                myQuestionsSet.add(myQuestion.question)
+                console.log(Array.from(myQuestionsSet))
+            }
 
             if (myQuestion) {
                 my.push(myQuestion)
             }
-            
-            console.log(my);
+
+            console.log(my)
         }
     })
 })
 
-
-const text = document.querySelector('#text')
-const timer = document.querySelector('#timer')
+const text = document.querySelector("#text")
+const timer = document.querySelector("#timer")
 
 let distance
 let startTime
@@ -50,18 +47,16 @@ audioBed.volume = 0.4
 
 window.addEventListener("keydown", handleKeyDown, true)
 
-
-function handleKeyDown (event) {
-
+function handleKeyDown(event) {
     console.log(state)
 
-    let letter = ''
+    let letter = ""
     let audio
 
-    if (event.type == 'click') {
+    if (event.type == "click") {
         letter = event.target.id.toUpperCase()
         event.target.blur()
-    } else if (event.type == 'keydown') {
+    } else if (event.type == "keydown") {
         letter = event.key.toUpperCase()
     }
 
@@ -92,7 +87,7 @@ function handleKeyDown (event) {
             startTimer(3000)
         }
         if (letter == "B") {
-            console.log('object')
+            console.log("object")
             const audio = new Audio("../sound/correct.m4a").play()
             // text.innerHTML = "Joueur 2"
             // startTimer(3000)
@@ -109,8 +104,6 @@ function handleKeyDown (event) {
         //     startTimer(3000)
         // }
     }
-
-
 
     // CORRECT
     if (letter == "Z") {
@@ -142,7 +135,6 @@ function handleKeyDown (event) {
             timer.innerHTML = ""
         }, "2000")
     }
-
 
     if (letter == "BACKSPACE") {
         console.log("hey")
@@ -181,17 +173,12 @@ function handleKeyDown (event) {
     if (letter == "ENTER") {
         console.log("uh")
     }
-
 }
-
-
-
-
 
 // variable to store our intervalID
 let nIntervId
 
-function startTimer (newDelay) {
+function startTimer(newDelay) {
     startTime = new Date().getTime()
     state = "BUZZED"
     delay = newDelay
@@ -202,13 +189,13 @@ function startTimer (newDelay) {
     }
 }
 
-function displayTimer () {
+function displayTimer() {
     const now = new Date().getTime()
     distance = now - startTime
     // var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
     // var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
     var seconds = Math.floor((distance % (1000 * 60)) / 1000)
-    var centiseconds = Math.floor((distance % (1000)) / 10)
+    var centiseconds = Math.floor((distance % 1000) / 10)
     seconds = seconds < 10 ? "0" + seconds : seconds
     centiseconds = centiseconds < 10 ? "0" + centiseconds : centiseconds
     timer.innerHTML = seconds + ":" + centiseconds
@@ -217,7 +204,7 @@ function displayTimer () {
     }
 }
 
-function stopTimer () {
+function stopTimer() {
     state = "IDLE"
     clearInterval(nIntervId)
     // release our intervalID from the variable
