@@ -297,10 +297,16 @@ io.on("connection", (socket) => {
     // })
 })
 
-app.get("", (req, res) => {
-    res.render("index", {
+// app.get("/", (req, res) => {
+//     res.render("index", {
+//         layout: "layouts/main",
+//         demo: "hello world : /real, /host & /player",
+//     })
+// })
+
+app.get("/", (req, res) => {
+    res.render("player", {
         layout: "layouts/main",
-        demo: "hello world : /real, /host & /player",
     })
 })
 
@@ -325,11 +331,7 @@ app.get('/builder', (req, res) => {
     })
 })
 
-app.get('/player', (req, res) => {
-    res.render('player', {
-        layout: 'layouts/main',
-    })
-})
+
 
 server.listen(port, () => {
     console.log(`server is up on port ${ port }`)
@@ -337,7 +339,10 @@ server.listen(port, () => {
 
 
 // TODO - Tout reprendre
-// [] Héberger !!!
+// [x] Héberger !!!
+// [] Faire une première manche avec 20 questions sélectionnées
+//      [] Les tester dans questions_v3 / quiz
+//      [] Base de donneés ? Mongoose ? Ou dans Questions ?
 // [] rendre beau côté /real
 // [] compter les points : système de réponses attendues tolérant + comptage de points manuel (ajouter / enlever)
 
