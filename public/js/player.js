@@ -57,7 +57,7 @@ socket.on("chronoUpdate", ({ endTime, isRunning }) => {
     }
 })
 
-socket.on("questionUpdate", (question) => {
+socket.on("questionUpdate", ({ question }) => {
     console.log(question)
     showQuestion(question)
 })
@@ -95,10 +95,9 @@ socket.on("buzzed", (pseudo) => {
 /////
 
 function showQuestion(question) {
-    // console.log("showQuestion")
     const questionElement = document.querySelector("#question")
     if (questionElement) {
-        questionElement.innerHTML = question
+        questionElement.innerHTML = question ? question.question : ""
     }
 }
 

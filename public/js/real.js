@@ -198,6 +198,8 @@ document.getElementById("reset").addEventListener("click", () => {
     socket.emit("reset")
 })
 
+// Chrono onload
+
 socket.on("chronoUpdate", ({ endTime, isRunning }) => {
     // onload
     if (isRunning) {
@@ -218,6 +220,8 @@ document.querySelectorAll(".decision").forEach((button) => {
         if (decision == "right" || decision == "steal") audioRight.play()
     })
 })
+
+// TODO: vérifier si on ne peut pas regrouper ?
 
 document.querySelector("#wrong").addEventListener("click", () => {
     if (isAffrontementPlaying) {

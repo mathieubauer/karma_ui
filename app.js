@@ -215,8 +215,8 @@ io.on("connection", (socket) => {
                 questionIndex++
             }
             if (decision == "steal") {
-                if (activeTeam == "A") scores.teamB += 1
-                if (activeTeam == "B") scores.teamA += 1
+                if (activeTeam == "A") scores.teamB += 2 // 2 points pour voler
+                if (activeTeam == "B") scores.teamA += 2
                 startCount()
                 questionIndex++
             }
@@ -316,16 +316,18 @@ io.on("connection", (socket) => {
         io.emit("buzzed", pseudo)
     })
 
-    // socket.on('timerEnded', () => {
-    //     console.log('timer ended')
-    //     setTimeout(function() {
-    //         resetCount()
-    //         io.emit('teamUpdate', { activeTeam: null })
-    //         questionIndex = 0
-    //         selectedQuestions = []
-    //         io.emit('questionUpdate', { question: null })
-    //     }, 5000)
-    // })
+    // Gestion du chrono
+
+    socket.on("timerEnded", () => {
+        console.log("timer ended")
+        setTimeout(function () {
+            resetCount()
+            io.emit("teamUpdate", { activeTeam: null })
+            questionIndex = 0
+            selectedQuestions = []
+            io.emit("questionUpdate", { question: null })
+        }, 5000)
+    })
 })
 
 // app.get("/", (req, res) => {
@@ -374,6 +376,9 @@ server.listen(port, () => {
 //      [x] Accueil : auth ou logo
 //      [x] Manche 1 : auth ou buzzers
 //      [] Manche 2 : écran spécial
+//              [] 5 thèmes
+//              [] Loader de partie
+//              [] Afficher toutes les questions de la manche
 //      [] Finale : écran spécial + système de vote
 // [] QR code pour url locale ?
 // [x] Héberger !!!
@@ -415,6 +420,5 @@ server.listen(port, () => {
 // [] Pouvoir modifier la question à la volée en cas de problème
 // [] Afficher les scores de chaque joueur (show Leaderboard)
 // [] Conserver la liste des réponses et des points on refresh
-
 
 // [] Générer un QR code avec le lien vers l'adresse en local ?
