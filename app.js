@@ -311,6 +311,7 @@ io.on("connection", (socket) => {
     })
 
     socket.on("playerBuzzed", ({ pseudo }) => {
+        if (!elementStates.buzzerActive) return // pour empêcher les quasi simultanés
         elementStates.buzzerActive = false
         io.emit("buzzed", pseudo)
     })
