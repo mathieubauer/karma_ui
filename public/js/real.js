@@ -79,8 +79,9 @@ socket.on("connectedPlayers", (players) => {
     playersList.innerHTML = ""
     players.forEach((player) => {
         const span = document.createElement("span")
-        span.innerHTML = `${player.pseudo} <br>`
+        span.innerHTML = `${player.pseudo}`
         span.id = player.pseudo
+        span.classList.add("badge", "text-bg-light", "rounded-pill", "me-1")
         playersList.appendChild(span)
     })
 })
@@ -245,6 +246,30 @@ socket.on("scoreUpdate", ({ scores }) => {
 document.getElementById("resetScore").addEventListener("click", () => {
     socket.emit("resetScore")
 })
+
+// buzzers, manche 1
+
+document.getElementById("activateBuzzerBtn").addEventListener("click", () => {
+    socket.emit("activateBuzzer")
+})
+
+socket.on("buzzResults", (playerId) => {
+    console.log(playerId)
+
+    // results est un tableau du type : [ { playerId: "Joueur1", serverTime: 1689330000000 }, ... ]
+    // Le premier est le gagnant. Les autres sont l'ordre d'arrivée.
+
+    // let html = "Ordre des buzz :<br>"
+    // const firstTime = results[0].serverTime
+    // results.forEach((r, index) => {
+    //     const diff = r.serverTime - firstTime
+    //     html += `${index + 1}. ${r.playerId} (+${diff} ms)<br>`
+    // })
+
+    document.getElementById("buzzResultsContainer").innerHTML = playerId
+})
+
+
 
 // ########## Gestion du son ##########
 

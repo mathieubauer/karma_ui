@@ -5,8 +5,10 @@ function checkUsername() {
     const savedPseudo = localStorage.getItem("pseudo")
     if (savedPseudo) {
         socket.emit("join", savedPseudo)
+        return true
     } else {
         buildPseudoInput()
+        return false
     }
 }
 
@@ -14,7 +16,7 @@ function buildPseudoInput() {
     const page = document.getElementById("page")
     if (!page) return console.error("Page element not found")
 
-    const container = document.createElement("div")
+    const container = document.createElement("form")
     container.className = "pseudo-container d-flex align-items-center"
 
     const pseudoInput = document.createElement("input")
@@ -28,12 +30,13 @@ function buildPseudoInput() {
     submitButton.className = "btn btn-primary ms-2"
     submitButton.textContent = "Rejoindre"
 
-    submitButton.addEventListener("click", () => {
+    container.addEventListener("submit", (e) => {
+        e.preventDefault()
         const pseudo = pseudoInput.value.trim()
         if (pseudo) {
             localStorage.setItem("pseudo", pseudo)
             socket.emit("join", pseudo)
-            showToast("Nom enregistré !", "success")
+            showToast("Enregistré !", "success")
             container.remove()
         }
     })

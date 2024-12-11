@@ -46,13 +46,16 @@ let questionIndex = 0
 const connectedUsers = {}
 
 const elementStates = {
+    round: 0,
     pseudo: false,
+    buzzerActive: false,
     questionContainer: false,
     answerInput: false,
     countdown: false,
     score: false,
     currentQuestion: "",
 }
+
 
 /**
  * Met tout le fichier dans questions
@@ -106,6 +109,9 @@ io.on("connection", (socket) => {
 
     // Seulement au client qui vient de se connecter
     socket.emit("updateElementStates", elementStates)
+
+    if (elementStates.round == 1) socket.emit("display_round1")
+    if (elementStates.round == 2) socket.emit("display_round2")
 
     // À tous les clients
     io.emit("chronoUpdate", { endTime, isRunning })
@@ -230,15 +236,21 @@ io.on("connection", (socket) => {
     // Display rounds
 
     socket.on("display_empty", () => {
-        io.emit("display_empty")
+        elementStates.round = 0
+        // io.emit("display_empty")
+        io.emit("updateElementStates", elementStates)
     })
 
     socket.on("display_round1", () => {
-        io.emit("display_round1")
+        elementStates.round = 1
+        // io.emit("display_round1")
+        io.emit("updateElementStates", elementStates)
     })
 
     socket.on("display_round2", () => {
-        io.emit("display_round2")
+        elementStates.round = 2
+        // io.emit("display_round2")
+        io.emit("updateElementStates", elementStates)
     })
 
     socket.on("changeElementVisibility", ({ elementId, isVisible }) => {
@@ -283,6 +295,20 @@ io.on("connection", (socket) => {
             delete connectedUsers[socket.id]
             io.emit("connectedPlayers", Object.values(connectedUsers))
         }
+    })
+
+    // Buzzers
+
+    socket.on("activateBuzzer", () => {
+        elementStates.buzzerActive = true
+        io.emit("updateElementStates", elementStates)
+    })
+
+    socket.on("playerBuzzed", ({ playerId, timestamp }) => {
+        if (!elementStates.buzzerActive) return // Si les buzzers ne sont pas actifs, on ignore
+        elementStates.buzzerActive = false
+        io.emit("buzzerLocked")
+        io.emit("buzzResults", playerId)
     })
 
     // socket.on('timerEnded', () => {
@@ -339,6 +365,11 @@ server.listen(port, () => {
 
 
 // TODO - Tout reprendre
+// [] Garder l'état de la manche actuelle côté serveur
+//      [] Accueil : auth ou logo
+//      [] Manche 1 : auth ou buzzers
+//      [] Manche 2 : écran spécial
+//      [] Finale : écran spécial + système de vote
 // [x] Héberger !!!
 // [] Faire une première manche avec 20 questions sélectionnées
 //      [] Les tester dans questions_v3 / quiz
