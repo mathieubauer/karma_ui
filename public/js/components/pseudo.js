@@ -1,12 +1,15 @@
 import socket from "./socket.js"
 import { showToast } from "./toast.js"
 
+const page = document.querySelector("#page")
+
 function checkUsername() {
     const savedPseudo = localStorage.getItem("pseudo")
     if (savedPseudo) {
         socket.emit("join", savedPseudo)
         return true
     } else {
+        page.innerHTML = ""
         buildPseudoInput()
         return false
     }

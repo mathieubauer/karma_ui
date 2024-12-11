@@ -102,13 +102,24 @@ io.on("connection", (socket) => {
     const userId = socket.id
     console.log("Un utilisateur s'est connecté: " + userId)
 
+    socket.emit("updateElementStates", elementStates)
+    socket.emit("checkUsername")
+
+    socket.on("join", (pseudo) => {
+        socket.userData = { id: socket.id, pseudo }
+        connectedUsers[socket.id] = socket.userData
+        console.log("User joined:", connectedUsers[socket.id]) // Vérifie que l'utilisateur est bien ajouté
+        io.emit("connectedPlayers", Object.values(connectedUsers))
+        socket.emit("updateElementStates", elementStates)
+    })
+
     if (!isRunning) {
         endTime = Date.now() + remainingTime
     }
     // endTime = Date.now() + remainingTime
 
     // Seulement au client qui vient de se connecter
-    socket.emit("updateElementStates", elementStates)
+    // socket.emit("updateElementStates", elementStates)
 
     if (elementStates.round == 1) socket.emit("display_round1")
     if (elementStates.round == 2) socket.emit("display_round2")
@@ -239,23 +250,27 @@ io.on("connection", (socket) => {
         elementStates.round = 0
         // io.emit("display_empty")
         io.emit("updateElementStates", elementStates)
+        io.emit("checkUsername")
     })
 
     socket.on("display_round1", () => {
         elementStates.round = 1
         // io.emit("display_round1")
         io.emit("updateElementStates", elementStates)
+        io.emit("checkUsername")
     })
 
     socket.on("display_round2", () => {
         elementStates.round = 2
         // io.emit("display_round2")
         io.emit("updateElementStates", elementStates)
+        io.emit("checkUsername")
     })
 
     socket.on("changeElementVisibility", ({ elementId, isVisible }) => {
         elementStates[elementId] = isVisible
         io.emit("updateElementStates", elementStates)
+        io.emit("checkUsername")
     })
 
     // Questions ouvertes
@@ -282,13 +297,6 @@ io.on("connection", (socket) => {
         socket.emit("connectedPlayers", Object.values(connectedUsers))
     })
 
-    socket.on("join", (pseudo) => {
-        socket.userData = { id: socket.id, pseudo }
-        connectedUsers[socket.id] = socket.userData
-        console.log("User joined:", connectedUsers[socket.id]) // Vérifie que l'utilisateur est bien ajouté
-        io.emit("connectedPlayers", Object.values(connectedUsers))
-    })
-
     socket.on("disconnect", () => {
         const userData = connectedUsers[socket.id]
         if (userData) {
@@ -302,6 +310,7 @@ io.on("connection", (socket) => {
     socket.on("activateBuzzer", () => {
         elementStates.buzzerActive = true
         io.emit("updateElementStates", elementStates)
+        io.emit("checkUsername")
     })
 
     socket.on("playerBuzzed", ({ playerId, timestamp }) => {

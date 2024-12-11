@@ -10,10 +10,13 @@ let localElementStates = {}
 
 // Gestion des affichages
 
+socket.on("checkUsername", () => {
+    checkUsername()
+})
+
 socket.on("updateElementStates", (elementStates) => {
     localElementStates = elementStates
     page.innerHTML = ""
-    if (!checkUsername()) return
     console.log("updateElementStates", elementStates)
     Object.entries(elementStates).forEach(([elementId, value]) => {
         if (elementId == "round") {
@@ -108,9 +111,7 @@ function showQuestion(question) {
 function buildBuzzer() {
     const buzzerButton = document.createElement("button")
     buzzerButton.id = "buzzerButton"
-    buzzerButton.className = "btn btn-primary"
     buzzerButton.disabled = !localElementStates.buzzerActive
-    buzzerButton.innerText = "BUZZ"
     page.appendChild(buzzerButton)
 
     buzzerButton.addEventListener("click", () => {
