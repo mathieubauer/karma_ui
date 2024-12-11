@@ -270,7 +270,7 @@ io.on("connection", (socket) => {
     socket.on("changeElementVisibility", ({ elementId, isVisible }) => {
         elementStates[elementId] = isVisible
         io.emit("updateElementStates", elementStates)
-        io.emit("checkUsername")
+        // io.emit("checkUsername")
     })
 
     // Questions ouvertes

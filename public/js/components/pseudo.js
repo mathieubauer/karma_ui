@@ -46,13 +46,12 @@ function buildPseudoInput() {
 
     container.appendChild(pseudoInput)
     container.appendChild(submitButton)
-
     page.appendChild(container)
 
     const savedPseudo = localStorage.getItem("pseudo")
     if (savedPseudo) {
         pseudoInput.value = savedPseudo
-        socket.emit("join", savedPseudo)
+        // socket.emit("join", savedPseudo)
     }
 }
 
