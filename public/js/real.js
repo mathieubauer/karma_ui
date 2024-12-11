@@ -28,6 +28,7 @@ let startTime
 let delay
 let state = "IDLE"
 
+
 // Affichage de l'écran joueur #####
 
 document.getElementById("display_empty").addEventListener("click", () => {
@@ -41,6 +42,10 @@ document.getElementById("display_round1").addEventListener("click", () => {
 document.getElementById("display_round2").addEventListener("click", () => {
     socket.emit("display_round2")
 })
+
+
+// ##### ON REPREND TOUT
+
 
 function toggleElement(elementId, checkbox) {
     const isVisible = checkbox.checked
@@ -253,20 +258,8 @@ document.getElementById("activateBuzzerBtn").addEventListener("click", () => {
     socket.emit("activateBuzzer")
 })
 
-socket.on("buzzResults", (playerId) => {
-    console.log(playerId)
-
-    // results est un tableau du type : [ { playerId: "Joueur1", serverTime: 1689330000000 }, ... ]
-    // Le premier est le gagnant. Les autres sont l'ordre d'arrivée.
-
-    // let html = "Ordre des buzz :<br>"
-    // const firstTime = results[0].serverTime
-    // results.forEach((r, index) => {
-    //     const diff = r.serverTime - firstTime
-    //     html += `${index + 1}. ${r.playerId} (+${diff} ms)<br>`
-    // })
-
-    document.getElementById("buzzResultsContainer").innerHTML = playerId
+socket.on("buzzed", (pseudo) => {
+    document.getElementById("buzzResultsContainer").innerHTML = pseudo
 })
 
 

@@ -17,23 +17,28 @@ socket.on("checkUsername", () => {
 socket.on("updateElementStates", (elementStates) => {
     localElementStates = elementStates
     page.innerHTML = ""
-    console.log("updateElementStates", elementStates)
+    // console.log("updateElementStates", elementStates)
     Object.entries(elementStates).forEach(([elementId, value]) => {
+        if (elementId == "pseudo" && value) {
+            buildPseudoInput()
+            return
+        }
+
         if (elementId == "round") {
             if (value == 1) {
                 buildBuzzer()
+                return
             }
             if (value == 2) {
                 buildCountdown()
                 buildScoreBoard()
                 buildQuestionContainer()
+                return
             }
         }
 
-        if (elementId == "pseudo" && value) buildPseudoInput()
         if (elementId == "questionContainer" && value) buildOpenQuestionContainer()
         if (elementId == "currentQuestion") showQuestion(value)
-        if (elementId == "buzzer" && value) buildBuzzer()
         // ...
     })
 
@@ -66,20 +71,6 @@ socket.on("display_empty", () => {
     buildLogo()
 })
 
-socket.on("display_round1", (round) => {
-    // page.innerHTML = ""
-    // // checkUsername()
-    // // buildOpenQuestionContainer()
-    // buildBuzzer()
-})
-
-socket.on("display_round2", () => {
-    // page.innerHTML = ""
-    // buildCountdown()
-    // buildScoreBoard()
-    // buildQuestionContainer()
-})
-
 // buzzers, pour ne pas recharger toute la page
 
 socket.on("buzzerOn", () => {
@@ -89,10 +80,15 @@ socket.on("buzzerOn", () => {
     }
 })
 
-socket.on("buzzerLocked", () => {
+socket.on("buzzed", (pseudo) => {
     const buzzerButton = document.getElementById("buzzerButton")
     if (buzzerButton) {
         buzzerButton.disabled = true
+    }
+
+    const savedPseudo = localStorage.getItem("pseudo")
+    if (savedPseudo == pseudo) {
+        buzzerButton.classList.add("first")
     }
 })
 
@@ -116,7 +112,7 @@ function buildBuzzer() {
 
     buzzerButton.addEventListener("click", () => {
         const pseudo = localStorage.getItem("pseudo") || "Anonymous"
-        socket.emit("playerBuzzed", { playerId: pseudo })
+        socket.emit("playerBuzzed", { pseudo })
         buzzerButton.disabled = true
     })
 }

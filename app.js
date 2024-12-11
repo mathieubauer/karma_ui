@@ -54,8 +54,8 @@ const elementStates = {
     countdown: false,
     score: false,
     currentQuestion: "",
+    activePlayer: null,
 }
-
 
 /**
  * Met tout le fichier dans questions
@@ -248,21 +248,18 @@ io.on("connection", (socket) => {
 
     socket.on("display_empty", () => {
         elementStates.round = 0
-        // io.emit("display_empty")
         io.emit("updateElementStates", elementStates)
         io.emit("checkUsername")
     })
 
     socket.on("display_round1", () => {
         elementStates.round = 1
-        // io.emit("display_round1")
         io.emit("updateElementStates", elementStates)
         io.emit("checkUsername")
     })
 
     socket.on("display_round2", () => {
         elementStates.round = 2
-        // io.emit("display_round2")
         io.emit("updateElementStates", elementStates)
         io.emit("checkUsername")
     })
@@ -270,7 +267,7 @@ io.on("connection", (socket) => {
     socket.on("changeElementVisibility", ({ elementId, isVisible }) => {
         elementStates[elementId] = isVisible
         io.emit("updateElementStates", elementStates)
-        // io.emit("checkUsername")
+        io.emit("checkUsername")
     })
 
     // Questions ouvertes
@@ -313,11 +310,9 @@ io.on("connection", (socket) => {
         io.emit("checkUsername")
     })
 
-    socket.on("playerBuzzed", ({ playerId, timestamp }) => {
-        if (!elementStates.buzzerActive) return // Si les buzzers ne sont pas actifs, on ignore
+    socket.on("playerBuzzed", ({ pseudo }) => {
         elementStates.buzzerActive = false
-        io.emit("buzzerLocked")
-        io.emit("buzzResults", playerId)
+        io.emit("buzzed", pseudo)
     })
 
     // socket.on('timerEnded', () => {
@@ -374,11 +369,12 @@ server.listen(port, () => {
 
 
 // TODO - Tout reprendre
-// [] Garder l'état de la manche actuelle côté serveur
-//      [] Accueil : auth ou logo
-//      [] Manche 1 : auth ou buzzers
+// [x] Garder l'état de la manche actuelle côté serveur
+//      [x] Accueil : auth ou logo
+//      [x] Manche 1 : auth ou buzzers
 //      [] Manche 2 : écran spécial
 //      [] Finale : écran spécial + système de vote
+// [] QR code pour url locale ?
 // [x] Héberger !!!
 // [] Faire une première manche avec 20 questions sélectionnées
 //      [] Les tester dans questions_v3 / quiz

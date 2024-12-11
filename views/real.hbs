@@ -16,7 +16,7 @@
 
         <div class="col-md-10 text-start">
 
-            <div id="players" class="">
+            <div id="players" class>
                 <h2 class="fs-5">Connected Players</h2>
                 <div id="playersList"></div>
             </div>
@@ -40,18 +40,21 @@
 
         <div class="col-md-2 text-start">
             <h1 class="fs-4">Manche 1</h1>
-            {{!-- <button type="button" id="display_empty"
-                class="btn btn-outline-secondary p-2 text-uppercase fw-bold">Empty</button> --}}
             <button type="button" id="display_round1"
                 class="btn btn-outline-secondary p-2 text-uppercase fw-bold">Manche 1</button>
         </div>
 
         <div class="col-md-10 text-start">
-            <button type="button" id="activateBuzzerBtn"
-                class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
-                Activer les buzzers
-            </button>
-            <div id="buzzResultsContainer"></div>
+
+            {{!-- div qui fait un alignement horizontal avec d-flex --}}
+            <div class="d-flex align-items-center mb-2">
+                <button type="button" id="activateBuzzerBtn"
+                    class="btn btn-secondary p-2 text-uppercase fw-bold">
+                    Activer les buzzers
+                </button>
+                <div id="buzzResultsContainer" class="ms-4"></div>
+            </div>
+
             <button type="button" id="requestQuestion"
                 class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
                 Question au hasard
