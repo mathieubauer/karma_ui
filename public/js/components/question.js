@@ -5,19 +5,19 @@ function buildQuestionContainer() {
 
     const questionCategory = document.createElement("div")
     questionCategory.id = "question-category"
-    questionCategory.className = "text-center fs-3 mt-5 fw-bold"
+    questionCategory.className = "text-center fs-3 mt-5 fw-bold text-warning"
     questionCategory.style.minHeight = "50px"
 
     const questionContainer = document.createElement("div")
     questionContainer.id = "question-container"
-    questionContainer.className =
-        "px-5 border rounded-5 d-flex align-items-center justify-content-center"
+    questionContainer.className = "px-5 border rounded-5 d-flex align-items-center justify-content-center"
     questionContainer.style.minHeight = "200px"
 
     const questionText = document.createElement("div")
     questionText.id = "question"
-    questionText.className = "fw-bold fs-1"
-    // questionText.style.minHeight = '100px'
+    questionText.className = "fw-bold fs-3z"
+    // questionText.style.fontSize = "clamp(24px, 5vw, 40px)"
+    questionText.style.cssText = "font-size: clamp(24px, 4vw, 40px);"
 
     questionContainer.appendChild(questionText)
     page.appendChild(questionCategory)

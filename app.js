@@ -390,6 +390,7 @@ server.listen(port, () => {
 //              [] Garder les points on refresh (actuellement, efface sur celui qui refresh et actualise les autres)
 //      [] Finale : écran spécial + système de vote
 // [] QR code pour url locale ?
+// [] Revoir les questions des parties ; reprendre des parties à 5 thèmes
 // [x] Héberger !!!
 // [] Faire une première manche avec 20 questions sélectionnées
 //      [] Les tester dans questions_v3 / quiz
@@ -429,5 +430,3 @@ server.listen(port, () => {
 // [] Pouvoir modifier la question à la volée en cas de problème
 // [] Afficher les scores de chaque joueur (show Leaderboard)
 // [] Conserver la liste des réponses et des points on refresh
-
-// [] Générer un QR code avec le lien vers l'adresse en local ?
