@@ -1,62 +1,76 @@
-<div id="page" class="container-fluid p-3 vh-100 vw-100">
+<div id="page" class="container-fluid p-4">
 
-    {{!-- ACCUEIL ########## --}}
+    {{! ACCUEIL ########## }}
 
     <div class="row">
 
         <div class="col-md-2 text-start">
             <h1 class="fs-4">Accueil</h1>
-            <button type="button" id="display_empty"
-                class="btn btn-outline-secondary p-2 text-uppercase fw-bold">Empty</button>
+            <button type="button" id="display_empty" class="roundButton btn p-2 text-uppercase fw-bold">Empty</button>
             <div class="form-check form-switch mt-3">
-                <input class="form-check-input" type="checkbox" role="switch" id="togglePseudo">
+                <input class="form-check-input" type="checkbox" role="switch" id="togglePseudo" />
                 <label class="form-check-label" for="togglePseudo">Pseudo</label>
             </div>
         </div>
 
-        <div class="col-md-10 text-start">
+        <div class="col-md-5 text-start">
 
             <div id="players" class>
                 <h2 class="fs-5">Connected Players</h2>
                 <div id="playersList"></div>
             </div>
 
-            {{!-- TODO: double ID --}}
+            {{! TODO: double ID }}
 
-            {{!-- <div id="players" class="col-3 border p-2">
+            {{! <div id="players" class="col-3 border p-2">
                 <h2 class="fs-4">Player Answers</h2>
                 <div id="answersList"></div>
-            </div> --}}
+            </div> }}
+
+        </div>
+
+        <div class="col-md-5">
+
+            <form id="questionFileForm">
+                <div class="mb-3">
+                    <label for="questionFileSelect" class="form-label">Sélectionnez un fichier de questions</label>
+                    <select class="form-select" id="questionFileSelect" required>
+                        <option value="" disabled selected>Choisissez un fichier</option>
+                        <option value="karma_game_007.csv">Karma Game 007</option>
+                        <option value="karma_game_008.csv">Karma Game 008</option>
+                        <option value="karma_game_009.csv">Karma Game 009</option>
+                        <option value="karma_game_010.csv">Karma Game 010</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary">Charger les Questions</button>
+            </form>
 
         </div>
 
     </div>
 
-    <hr>
+    <hr />
 
-    {{!-- ROUND 1 ########## --}}
+    {{! ROUND 1 ########## }}
 
     <div class="row">
 
         <div class="col-md-2 text-start">
             <h1 class="fs-4">Manche 1</h1>
-            <button type="button" id="display_round1"
-                class="btn btn-outline-secondary p-2 text-uppercase fw-bold mb-2">Manche 1</button>
+            <button type="button" id="display_round1" class="roundButton btn p-2 text-uppercase fw-bold mb-2">Manche 1</button>
         </div>
 
         <div class="col-md-10 text-start">
 
-            {{!-- div qui fait un alignement horizontal avec d-flex --}}
+            {{! div qui fait un alignement horizontal avec d-flex }}
             <div class="d-flex align-items-center mb-2">
-                <button type="button" id="activateBuzzerBtn"
-                    class="btn btn-secondary p-2 text-uppercase fw-bold">
+                <button type="button" id="activateBuzzerBtn" class="btn btn-secondary p-2 text-uppercase fw-bold">
                     Activer les buzzers
                 </button>
                 <div id="buzzResultsContainer" class="ms-4"></div>
             </div>
 
-            <button type="button" id="requestQuestion"
-                class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
+            <button type="button" id="requestQuestion" class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
                 Question au hasard
             </button>
             <table border="1" id="tableau" class="table mb-2" style="height: 100px;">
@@ -65,249 +79,169 @@
                     <td id="answerRand" class="fw-bold"></td>
                 </tr>
             </table>
-            <button type="button" id="sendQuestion"
-                class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
+            <button type="button" id="sendQuestion" class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
                 Envoyer la question
             </button>
         </div>
 
     </div>
 
-    <hr>
+    <hr />
 
-    {{!-- ROUND 2 ########## --}}
+    {{! ROUND 2 ########## }}
 
     <div class="row">
         <div class="col-md-2 text-start">
             <h1 class="fs-4">Manche 2</h1>
-            <button type="button" id="display_round2"
-                class="btn btn-outline-secondary mb-2 p-2 text-uppercase fw-bold">Manche
-                2</button>
-            <br>
-            <button type="button" id="playSuspense"
-                class="btn btn-secondary btn-sm mb-2 p-2 text-uppercase fw-bold">Suspense
-                (C)</button>
-            <button type="button" id="playGameBed"
-                class="btn btn-outline-secondary btn-sm mb-2 p-2 text-uppercase fw-bold">Affrontement
+            <button type="button" id="display_round2" class="roundButton btn mb-2 p-2 text-uppercase fw-bold">Manche 2</button>
+            <br />
+            <button type="button" id="playSuspense" class="btn btn-secondary btn-sm mb-2 p-2 text-uppercase fw-bold">Suspense (C)</button>
+            <button type="button" id="playGameBed" class="btn btn-outline-secondary btn-sm mb-2 p-2 text-uppercase fw-bold">Affrontement
                 (Space)</button>
         </div>
         <div class="col-md-10 text-start">
-            <button type="button" id="pop"
-                class="btn btn-outline-secondary category me-2 my-1 p-2 text-uppercase fw-bold">
+            <button type="button" id="pop" class="btn btn-secondary category me-2 my-1 p-2 text-uppercase fw-bold">
                 Pop culture, loisirs et sports
             </button>
-            <button type="button" id="vie"
-                class="btn btn-outline-secondary category me-2 my-1 p-2 text-uppercase fw-bold">
+            <button type="button" id="vie" class="btn btn-secondary category me-2 my-1 p-2 text-uppercase fw-bold">
                 Vie quotidienne
             </button>
-            <button type="button" id="mon"
-                class="btn btn-outline-secondary category me-2 my-1 p-2 text-uppercase fw-bold">
+            <button type="button" id="mon" class="btn btn-secondary category me-2 my-1 p-2 text-uppercase fw-bold">
                 Connaissance du monde
             </button>
-            <button type="button" id="aca"
-                class="btn btn-outline-secondary category me-2 my-1 p-2 text-uppercase fw-bold">
+            <button type="button" id="aca" class="btn btn-secondary category me-2 my-1 p-2 text-uppercase fw-bold">
                 Savoirs académiques
             </button>
 
-            <hr>
+            <hr />
 
-            <button type="button" id="startA"
-                class="btn btn-primary start me-2 mb-2 p-2 text-uppercase fw-bold">Start A</button>
-            <button type="button" id="startB"
-                class="btn btn-primary start me-2 mb-2 p-2 text-uppercase fw-bold">Start B</button>
+            <div class="row">
+                <div class="col-6">
+                    <button type="button" id="startA" class="btn btn-primary start me-2 mb-2 p-2 text-uppercase fw-bold">Start A</button>
+                    <button type="button" id="startB" class="btn btn-primary start me-2 mb-2 p-2 text-uppercase fw-bold">Start B</button>
 
-            <button type="button" id="draw"
-                class="btn btn-secondary me-2 mb-2 p-2 text-uppercase fw-bold">Si égalité</button>
-            {{!-- <button type="button" id="pause"
-                class="btn btn-primary me-2 mb-2 p-2 text-uppercase fw-bold">Pause</button> --}}
-            <button type="button" id="reset"
-                class="btn btn-outline-danger me-2 mb-2 p-2 text-uppercase fw-bold">Reset
-                time</button>
+                    <button type="button" id="draw" class="btn btn-secondary me-2 mb-2 p-2 text-uppercase fw-bold">Si égalité</button>
+                    {{! <button type="button" id="pause"
+                class="btn btn-primary me-2 mb-2 p-2 text-uppercase fw-bold">Pause</button>
+            }}
+                    <button type="button" id="resetTime" class="btn btn-outline-danger me-2 mb-2 p-2 text-uppercase fw-bold">Reset time</button>
 
-            <div id="countdownContainer" class="fs-2"></div>
+                    <div id="countdownContainer" class="fs-2"></div>
+                </div>
+                <div class="col-6">
+                    <div id="scoreContainer"></div>
+                </div>
+            </div>
 
-            <hr>
+            <hr />
 
             <div id="question-container" class="d-flex bg-white text-dark mb-3">
                 <div id="question" class="col-md-8 p-3" style="height: 100px;"></div>
                 <div id="answer" class="col-md-4 p-3 fw-bold text-end" style="height: 100px;"></div>
             </div>
 
-            <button type="button" id="right"
-                class="btn btn-success decision me-2 mb-2 p-2 text-uppercase fw-bold">Correct</button>
-            <button type="button" id="wrong"
-                class="btn btn-danger decision me-2 mb-2 p-2 text-uppercase fw-bold">Incorrect</button>
-            <button type="button" id="steal"
-                class="btn btn-warning decision me-2 mb-2 p-2 text-uppercase fw-bold">Vol</button>
-            <button type="button" id="resetScore"
-                class="btn btn-outline-danger me-2 mb-2 p-2 text-uppercase fw-bold">Reset
-                score</button>
-
-            <div id="scoreContainer"></div>
+            <button type="button" id="right" class="btn btn-success decision me-2 mb-2 p-2 text-uppercase fw-bold">Correct</button>
+            <button type="button" id="wrong" class="btn btn-danger decision me-2 mb-2 p-2 text-uppercase fw-bold">Incorrect</button>
+            <button type="button" id="steal" class="btn btn-warning decision me-2 mb-2 p-2 text-uppercase fw-bold">Vol</button>
+            <button type="button" id="resetScore" class="btn btn-outline-danger me-2 mb-2 p-2 text-uppercase fw-bold">Reset score</button>
 
             <div>
                 {{#each questionsElim}}
-                <div class="my-2">
-                    <span>{{question}}</span> <br>
-                    <span class="fw-bold">{{answer}}</span>
-                </div>
+                    <div class="my-2">
+                        <span>{{question}}</span>
+                        <br />
+                        <span class="fw-bold">{{answer}}</span>
+                    </div>
                 {{/each}}
             </div>
 
         </div>
     </div>
 
-    <hr class="border border-primary border-3 opacity-75">
+    <hr class="border border-primary border-3 opacity-75" />
 
-    {{!-- ########## --}}
-    {{!-- ########## --}}
-    {{!-- ########## --}}
-
-    <div class="row">
-        <div id="round" class="col-3 border p-2">
-            <button type="button" id="display_round1"
-                class="btn btn-outline-secondary p-2 text-uppercase fw-bold">Manche 1</button>
-        </div>
-
-    </div>
+    {{! ########## }}
+    {{! ########## }}
+    {{! ########## }}
 
     <div class="form-check form-switch mb-2">
-        <input class="form-check-input" type="checkbox" id="toggleQuestionContainer">
+        <input class="form-check-input" type="checkbox" id="toggleQuestionContainer" />
         <label class="form-check-label" for="toggleQuestionContainer">Question Container</label>
     </div>
     <div class="form-check form-switch mb-2">
-        <input class="form-check-input" type="checkbox" id="toggleAnswerInput">
+        <input class="form-check-input" type="checkbox" id="toggleAnswerInput" />
         <label class="form-check-label" for="toggleAnswerInput">Answer Input</label>
     </div>
     <div class="form-check form-switch mb-2">
-        <input class="form-check-input" type="checkbox" id="toggleCountdown">
+        <input class="form-check-input" type="checkbox" id="toggleCountdown" />
         <label class="form-check-label" for="toggleCountdown">Countdown</label>
     </div>
     <div class="form-check form-switch mb-2">
-        <input class="form-check-input" type="checkbox" id="toggleScore">
+        <input class="form-check-input" type="checkbox" id="toggleScore" />
         <label class="form-check-label" for="toggleScore">Score</label>
     </div>
 
-    <hr>
-    <hr>
-    <hr>
+    <hr />
+    <hr />
+    <hr />
 
-    <button type="button" id="playGenerique"
-        class="btn btn-secondary btn-sm m-2 p-2 text-uppercase fw-bold">Générique (G)</button>
-    <button type="button" id="playSting"
-        class="btn btn-secondary btn-sm m-2 p-2 text-uppercase fw-bold">Sting (H)</button>
+    <button type="button" id="playGenerique" class="btn btn-secondary btn-sm m-2 p-2 text-uppercase fw-bold">Générique (G)</button>
+    <button type="button" id="playSting" class="btn btn-secondary btn-sm m-2 p-2 text-uppercase fw-bold">Sting (H)</button>
 
-    <br>
+    <br />
 
-    {{!-- <p class="small">
+    {{! <p class="small">
         BUZZ : QWERTYUIOPA - CORRECT : Z - INCORRECT : X - TIMEOUT : L
-    </p> --}}
+    </p> }}
 
-    <hr>
-
-    <div class="row">
-        <div class="col-md-2 text-start">
-            <h1 class="fs-4">Manche 1</h1>
-            <button type="button" id="display_empty"
-                class="btn btn-outline-secondary p-2 text-uppercase fw-bold">Empty</button>
-        </div>
-        <div class="col-md-10 text-start">
-            <button type="button" id="requestQuestion"
-                class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
-                Question au hasard
-            </button>
-            <table border="1" id="tableau" class="table mb-2" style="height: 100px;">
-                <tr>
-                    <td id="questionRand"></td>
-                    <td id="answerRand" class="fw-bold"></td>
-                </tr>
-            </table>
-            <button type="button" id="sendQuestion"
-                class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
-                Envoyer la question
-            </button>
-        </div>
-        <button id="activateBuzzerBtn">Activer les buzzers</button>
-
-    </div>
-
-    <hr>
-
-    
-
-    <hr>
+    <hr />
 
     <div class="row">
         <div class="col-md-2 text-start">
             <h1 class="fs-4">Finale</h1>
         </div>
         <div class="col-md-10 text-start">
-            <button type="button" id="playStingFinale"
-                class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">Sting finale
+            <button type="button" id="playStingFinale" class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">Sting finale
                 (J)</button>
-            <button type="button" id="playFinale"
-                class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">Bed Finale
-                (K)</button>
-            <button type="button" id="playFinaleWin"
-                class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">Finale Win
-                (B)</button>
-            <button type="button" id="playFinaleLose"
-                class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">Finale Lose
-                (N)</button>
+            <button type="button" id="playFinale" class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">Bed Finale (K)</button>
+            <button type="button" id="playFinaleWin" class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">Finale Win (B)</button>
+            <button type="button" id="playFinaleLose" class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">Finale Lose (N)</button>
 
             <div>
                 {{#each questionsFinale}}
-                <div class="my-2">
-                    <span>{{question}}</span> <br>
-                    <span class="fw-bold">{{answer}}</span>
-                </div>
+                    <div class="my-2">
+                        <span>{{question}}</span>
+                        <br />
+                        <span class="fw-bold">{{answer}}</span>
+                    </div>
                 {{/each}}
             </div>
 
-        </div>
-
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-            data-bs-target="#allQuestions">
-            Launch demo modal
-        </button>
-
-        <p class="d-inline-flex gap-1">
-            <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
-                data-bs-target="#allQuestionsCollapse"
-                aria-expanded="false" aria-controls="allQuestionsCollapse">
-                Questions
-            </button>
-        </p>
-        <div class="collapse" id="allQuestionsCollapse">
-            <div class="card card-body">
-                {{#each questions}}
-                <div class="my-2">
-                    <span>{{category}}</span>
-                    -
-                    <span>{{question}}</span> <br>
-                    <span class="fw-bold">{{answer}}</span>
-                </div>
-                {{/each}}
-            </div>
         </div>
 
     </div>
 
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="allQuestions" tabindex="-1" aria-labelledby="allQuestionsLabel"
-    aria-hidden="true">
+<!-- TODO: Modal pour les règles
+
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#allQuestions">
+            Launch demo modal
+        </button>
+
+<div class="modal fade" id="allQuestions" tabindex="-1" aria-labelledby="allQuestionsLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
 
             <div class="modal-body">
-
+                hello world
             </div>
 
         </div>
     </div>
 </div>
+
+-->
 
 <script src="/socket.io/socket.io.js"></script>
 <script type="module" src="/js/real.js"></script>

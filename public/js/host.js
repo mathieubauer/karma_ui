@@ -1,10 +1,6 @@
 import socket from "./components/socket.js"
 import { buildScoreBoard, updateScores } from "./components/score.js"
-import {
-    buildCountdown,
-    startCountdown,
-    pauseCountdown,
-} from "./components/countdown.js"
+import { buildCountdown, startCountdown, pauseCountdown } from "./components/countdown.js"
 
 socket.on("chronoUpdate", ({ endTime, isRunning }) => {
     if (isRunning) {
@@ -43,9 +39,10 @@ socket.on("questionUpdate", ({ question }) => {
     }
 })
 
-socket.on("scoreUpdate", ({ scores }) => {
-    updateScores(scores)
-})
+// REMPLACE
+// socket.on("scoreUpdate", ({ scores }) => {
+//     updateScores(scores)
+// })
 
 socket.on("displayError", ({ error }) => {
     document.querySelector("#question").innerHTML = error

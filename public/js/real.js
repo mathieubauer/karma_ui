@@ -1,10 +1,7 @@
 import socket from "./components/socket.js"
 import { buildScoreBoard, updateScores } from "./components/score.js"
 import { buildCountdown, startCountdown, pauseCountdown } from "./components/countdown.js"
-
-// ONLOAD
-buildCountdown()
-buildScoreBoard()
+import { showToast } from "./components/toast.js"
 
 // Déclaration des sons
 const audioBuzz = new Audio("../sound/hit_01.mp3")
@@ -23,11 +20,54 @@ audioFinale.volume = 0.4
 
 // Variables
 let isAffrontementPlaying = false
-let distance
-let startTime
-let delay
 let state = "IDLE"
 
+// Affichage de l'écran real #####
+
+socket.emit("getElementStates") // onload
+
+socket.on("updateElementStates", (elementStates) => {
+    if (elementStates.round || elementStates.round == 0) {
+        if (elementStates.round == 0) displayRoundButtons("display_empty")
+        if (elementStates.round == 1) displayRoundButtons("display_round1")
+        if (elementStates.round == 2) displayRoundButtons("display_round2")
+    }
+
+    if (elementStates.currentCategory) {
+        displayCategoryButtons(elementStates.currentCategory)
+    }
+
+    if (elementStates.isRunning !== undefined && elementStates.remainingTime !== undefined && elementStates.endTime !== undefined) {
+        document.querySelector("#countdownContainer").innerHTML = ""
+        buildCountdown()
+        if (elementStates.isRunning) {
+            startCountdown(elementStates.endTime)
+        } else {
+            pauseCountdown(elementStates.remainingTime)
+        }
+    }
+
+    if (elementStates.scoreA !== undefined && elementStates.scoreB !== undefined) {
+        document.querySelector("#scoreContainer").innerHTML = ""
+        buildScoreBoard()
+        updateScores(elementStates.scoreA, elementStates.scoreB)
+    }
+
+    document.querySelector("#question").innerHTML = elementStates.currentQuestion ? elementStates.currentQuestion.question : ""
+    document.querySelector("#answer").innerHTML = elementStates.currentQuestion ? elementStates.currentQuestion.answer : ""
+
+    if (!elementStates.currentQuestion) {
+        // add attribute disabled
+
+        document.querySelector("#right").disabled = true
+        document.querySelector("#wrong").disabled = true
+        document.querySelector("#steal").disabled = true
+    } else {
+        document.querySelector("#right").disabled = false
+        document.querySelector("#wrong").disabled = false
+        document.querySelector("#steal").disabled = false
+    }
+})
 
 // Affichage de l'écran joueur #####
 
@@ -43,42 +83,30 @@ document.getElementById("display_round2").addEventListener("click", () => {
     socket.emit("display_round2")
 })
 
-
 // ##### ON REPREND TOUT
-
 
 function toggleElement(elementId, checkbox) {
     const isVisible = checkbox.checked
     socket.emit("changeElementVisibility", { elementId, isVisible })
 }
 
-socket.on("updateElementStates", (elementStates) => {
-    document.getElementById("togglePseudo").checked = elementStates.pseudo
-    document.getElementById("toggleQuestionContainer").checked = elementStates.questionContainer
-    document.getElementById("toggleAnswerInput").checked = elementStates.answerInput
-    document.getElementById("toggleCountdown").checked = elementStates.countdown
-    document.getElementById("toggleScore").checked = elementStates.score
-})
+// socket.on("updateElementStates", (elementStates) => {
+//     document.getElementById("togglePseudo").checked = elementStates.pseudo
+//     document.getElementById("toggleQuestionContainer").checked = elementStates.questionContainer
+//     document.getElementById("toggleAnswerInput").checked = elementStates.answerInput
+//     document.getElementById("toggleCountdown").checked = elementStates.countdown
+//     document.getElementById("toggleScore").checked = elementStates.score
+// })
 
-document
-    .getElementById("togglePseudo")
-    .addEventListener("change", (e) => toggleElement("pseudo", e.target))
-document
-    .getElementById("toggleQuestionContainer")
-    .addEventListener("change", (e) => toggleElement("questionContainer", e.target))
-document
-    .getElementById("toggleAnswerInput")
-    .addEventListener("change", (e) => toggleElement("answerInput", e.target))
-document
-    .getElementById("toggleCountdown")
-    .addEventListener("change", (e) => toggleElement("countdown", e.target))
-document
-    .getElementById("toggleScore")
-    .addEventListener("change", (e) => toggleElement("score", e.target))
+// document.getElementById("togglePseudo").addEventListener("change", (e) => toggleElement("pseudo", e.target))
+// document.getElementById("toggleQuestionContainer").addEventListener("change", (e) => toggleElement("questionContainer", e.target))
+// document.getElementById("toggleAnswerInput").addEventListener("change", (e) => toggleElement("answerInput", e.target))
+// document.getElementById("toggleCountdown").addEventListener("change", (e) => toggleElement("countdown", e.target))
+// document.getElementById("toggleScore").addEventListener("change", (e) => toggleElement("score", e.target))
 
 // Gestion des utilisateurs #####
 
-socket.emit("hostConnected")
+socket.emit("getConnectedHosts")
 
 socket.on("connectedPlayers", (players) => {
     playersList.innerHTML = ""
@@ -127,19 +155,6 @@ document.querySelectorAll(".category").forEach((button) => {
     })
 })
 
-socket.on("displayCategory", ({ category }) => {
-    // onload
-    document.querySelectorAll(".category").forEach((button) => {
-        button.classList.remove("btn-secondary")
-        button.classList.remove("btn-outline-secondary")
-        if (button.id == category) {
-            button.classList.add("btn-secondary")
-        } else {
-            button.classList.add("btn-outline-secondary")
-        }
-    })
-})
-
 // Start
 
 document.querySelectorAll(".start").forEach((button) => {
@@ -175,43 +190,20 @@ socket.on("teamUpdate", ({ activeTeam }) => {
     }
 })
 
-socket.on("questionUpdate", ({ question }) => {
-    // onload
-    if (question) {
-        document.querySelector("#question").innerHTML = question.question
-        document.querySelector("#answer").innerHTML = question.answer
-    } else {
-        document.querySelector("#question").innerHTML = ""
-        document.querySelector("#answer").innerHTML = ""
-    }
-})
-
 // Draw
 
 document.querySelector("#draw").addEventListener("click", () => {
     socket.emit("draw")
 })
 
-// Reset
+// resetTime
 
-document.getElementById("reset").addEventListener("click", () => {
-    socket.emit("reset")
-})
-
-// Chrono onload
-
-socket.on("chronoUpdate", ({ endTime, isRunning }) => {
-    // onload
-    if (isRunning) {
-        startCountdown(endTime)
-    } else {
-        pauseCountdown(endTime)
-    }
+document.getElementById("resetTime").addEventListener("click", () => {
+    socket.emit("resetTime")
 })
 
 // Decision (right, wrong, steal)
 
-// todo: stop sound bed on incorrect
 document.querySelectorAll(".decision").forEach((button) => {
     button.addEventListener("click", (event) => {
         const decision = event.target.id
@@ -245,15 +237,27 @@ document.querySelector("#steal").addEventListener("click", () => {
     }
 })
 
-socket.on("scoreUpdate", ({ scores }) => {
-    // onload
-    updateScores(scores)
-})
-
 // Reset score
 
 document.getElementById("resetScore").addEventListener("click", () => {
     socket.emit("resetScore")
+})
+
+// Gestion des questionnaires
+
+document.getElementById("questionFileForm").addEventListener("submit", (e) => {
+    e.preventDefault() // Empêche le rechargement de la page
+
+    const select = document.getElementById("questionFileSelect")
+    const selectedFile = select.value
+
+    if (selectedFile) {
+        // Émet l'événement avec le nom du fichier sélectionné
+        socket.emit("changeQuestionFile", { fileName: selectedFile })
+        showToast(`Fichier de questions "${selectedFile}" chargé avec succès !`, "success")
+    } else {
+        showToast("Veuillez sélectionner un fichier de questions.", "danger")
+    }
 })
 
 // buzzers, manche 1
@@ -266,28 +270,18 @@ socket.on("buzzed", (pseudo) => {
     document.getElementById("buzzResultsContainer").innerHTML = pseudo
 })
 
-
-
 // ########## Gestion du son ##########
 
-document
-    .getElementById("playGenerique")
-    .addEventListener("click", () => playOrPause(audioGenerique))
+document.getElementById("playGenerique").addEventListener("click", () => playOrPause(audioGenerique))
 document.getElementById("playSting").addEventListener("click", () => playOrPause(audioSting))
-document
-    .getElementById("playStingFinale")
-    .addEventListener("click", () => playOrPause(audioStingFinale))
+document.getElementById("playStingFinale").addEventListener("click", () => playOrPause(audioStingFinale))
 
 document.getElementById("playGameBed").addEventListener("click", () => playOrPause(audioBed))
 document.getElementById("playSuspense").addEventListener("click", () => playOrPause(audioSuspense))
 document.getElementById("playFinale").addEventListener("click", () => playOrPause(audioFinale))
 
-document
-    .getElementById("playFinaleWin")
-    .addEventListener("click", () => playOrPause(audioFinaleWin))
-document
-    .getElementById("playFinaleLose")
-    .addEventListener("click", () => playOrPause(audioFinaleLose))
+document.getElementById("playFinaleWin").addEventListener("click", () => playOrPause(audioFinaleWin))
+document.getElementById("playFinaleLose").addEventListener("click", () => playOrPause(audioFinaleLose))
 
 socket.on("soundOff", () => {
     stopSound(audioBed)
@@ -308,8 +302,6 @@ function handleKeyDown(event) {
     } else if (event.type == "keydown") {
         letter = event.key.toUpperCase()
     }
-
-    console.log(letter)
 
     if (state == "IDLE") {
         // BUZZ
@@ -403,26 +395,6 @@ const stopSound = (track) => {
 // variable to store our intervalID
 let nIntervId
 
-function startTimer(newDelay) {
-    startTime = new Date().getTime()
-    state = "BUZZED"
-    delay = newDelay
-    // check if an interval has already been set up
-
-    if (!nIntervId) {
-        nIntervId = setInterval(displayTimer, 20)
-    }
-}
-
-function displayTimer() {
-    const now = new Date().getTime()
-    distance = now - startTime
-    var seconds = Math.floor((distance % (1000 * 60)) / 1000)
-    var centiseconds = Math.floor((distance % 1000) / 10)
-    seconds = seconds < 10 ? "0" + seconds : seconds
-    centiseconds = centiseconds < 10 ? "0" + centiseconds : centiseconds
-}
-
 function stopTimer() {
     state = "IDLE"
     clearInterval(nIntervId)
@@ -430,15 +402,20 @@ function stopTimer() {
     nIntervId = null
 }
 
-function pad(number) {
-    return number < 10 ? "0" + number : number
+// #####
+
+function displayRoundButtons(activeRound) {
+    document.querySelectorAll(".roundButton").forEach((button) => {
+        button.classList.remove("btn-warning")
+        button.classList.add("btn-secondary")
+    })
+    document.querySelector(`#${activeRound}`).classList.add("btn-warning")
 }
 
-function formattedTime(time) {
-    const hours = pad(time.getHours())
-    const minutes = pad(time.getMinutes())
-    const seconds = pad(time.getSeconds())
-    const milliseconds = time.getMilliseconds()
-    const centiseconds = Math.floor(milliseconds / 10)
-    return `${hours}:${minutes}:${seconds}.${pad(centiseconds)}`
+function displayCategoryButtons(activeCategory) {
+    document.querySelectorAll(".category").forEach((button) => {
+        button.classList.remove("btn-warning")
+        button.classList.add("btn-secondary")
+    })
+    document.querySelector(`#${activeCategory}`).classList.add("btn-warning")
 }

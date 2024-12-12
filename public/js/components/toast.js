@@ -1,5 +1,6 @@
 function showToast(message, type = "success", duration = 3000) {
     const toastContainer = document.getElementById("toastContainer")
+    toastContainer.style = "width: 100%;"
 
     // Créer l'élément du toast
     const toast = document.createElement("div")
@@ -7,6 +8,7 @@ function showToast(message, type = "success", duration = 3000) {
     toast.role = "alert"
     toast.setAttribute("aria-live", "assertive")
     toast.setAttribute("aria-atomic", "true")
+    toast.style = "width: 100%;"
 
     toast.innerHTML = `
         <div class="d-flex">

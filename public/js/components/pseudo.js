@@ -20,13 +20,14 @@ function buildPseudoInput() {
     if (!page) return console.error("Page element not found")
 
     const container = document.createElement("form")
-    container.className = "pseudo-container d-flex align-items-center"
+    container.className = "pseudo-container d-flex align-items-center justify-content-center"
 
     const pseudoInput = document.createElement("input")
     pseudoInput.type = "text"
     pseudoInput.id = "pseudoInput"
     pseudoInput.className = "form-control"
     pseudoInput.placeholder = "Votre nom"
+    pseudoInput.style = "max-width: 400px"
 
     const submitButton = document.createElement("button")
     submitButton.id = "joinBtn"

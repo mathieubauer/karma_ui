@@ -2,10 +2,16 @@ import socket from "./socket.js"
 import { showToast } from "./toast.js"
 
 function buildQuestionContainer() {
+
+    const questionCategory = document.createElement("div")
+    questionCategory.id = "question-category"
+    questionCategory.className = "text-center fs-3 mt-5 fw-bold"
+    questionCategory.style.minHeight = "50px"
+
     const questionContainer = document.createElement("div")
     questionContainer.id = "question-container"
     questionContainer.className =
-        "mt-5 px-5 border rounded-pill d-flex align-items-center justify-content-center"
+        "px-5 border rounded-5 d-flex align-items-center justify-content-center"
     questionContainer.style.minHeight = "200px"
 
     const questionText = document.createElement("div")
@@ -14,6 +20,7 @@ function buildQuestionContainer() {
     // questionText.style.minHeight = '100px'
 
     questionContainer.appendChild(questionText)
+    page.appendChild(questionCategory)
     page.appendChild(questionContainer)
 }
 

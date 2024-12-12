@@ -1,45 +1,74 @@
 import socket from "./components/socket.js"
 import { buildScoreBoard, updateScores } from "./components/score.js"
-import { buildCountdown, startCountdown, pauseCountdown } from "./components/countdown.js"
+import { buildCountdown, startCountdown, pauseCountdown, updateCountdown } from "./components/countdown.js"
 import { buildOpenQuestionContainer, buildQuestionContainer } from "./components/question.js"
 import { buildLogo } from "./components/logo.js"
 import { buildPseudoInput, checkUsername } from "./components/pseudo.js"
 
 const page = document.querySelector("#page")
+
+const categoryMap = {
+    aca: "Savoirs académiques",
+    pop: "Pop culture, loisirs et sports",
+    vie: "Vie quotidienne",
+    mon: "Connaissance du monde",
+}
+
 let localElementStates = {}
+
+// Vérification de l'identification
+
+const pseudo = localStorage.getItem("pseudo")
+if (pseudo) {
+    socket.emit("join", pseudo)
+} else {
+    page.innerHTML = ""
+    buildPseudoInput()
+}
+
+// #####
 
 // Gestion des affichages
 
-socket.on("checkUsername", () => {
-    checkUsername()
-})
-
 socket.on("updateElementStates", (elementStates) => {
+    console.log(elementStates)
     localElementStates = elementStates
     page.innerHTML = ""
-    // console.log("updateElementStates", elementStates)
-    Object.entries(elementStates).forEach(([elementId, value]) => {
-        if (elementId == "pseudo" && value) {
-            buildPseudoInput()
+
+    if (elementStates.pseudo) {
+        buildPseudoInput()
+        return
+    }
+
+    if (elementStates.round || elementStates.round == 0) {
+        if (elementStates.round == 1) {
+            buildBuzzer()
             return
         }
 
-        if (elementId == "round") {
-            if (value == 1) {
-                buildBuzzer()
-                return
+        if (elementStates.round == 2) {
+            buildCountdown(elementStates.remainingTime)
+            if (elementStates.isRunning) {
+                startCountdown(elementStates.endTime)
+            } else {
+                pauseCountdown(elementStates.remainingTime)
             }
-            if (value == 2) {
-                buildCountdown()
-                buildScoreBoard()
-                buildQuestionContainer()
-                return
-            }
-        }
 
+            buildScoreBoard()
+            updateScores(elementStates.scoreA, elementStates.scoreB)
+
+            buildQuestionContainer()
+            if (elementStates.currentCategory) {
+                document.querySelector("#question-category").textContent = categoryMap[elementStates.currentCategory]
+            }
+            showQuestion(elementStates.currentQuestion)
+            return
+        }
+    }
+
+    Object.entries(elementStates).forEach(([elementId, value]) => {
         if (elementId == "questionContainer" && value) buildOpenQuestionContainer()
         if (elementId == "currentQuestion") showQuestion(value)
-        // ...
     })
 
     if (page.innerHTML == "") {
@@ -49,21 +78,16 @@ socket.on("updateElementStates", (elementStates) => {
 
 // #####
 
-socket.on("chronoUpdate", ({ endTime, isRunning }) => {
+socket.on("chronoUpdate", ({ isRunning, remainingTime, endTime }) => {
     if (isRunning) {
         startCountdown(endTime)
     } else {
-        pauseCountdown(endTime)
+        pauseCountdown(remainingTime)
     }
 })
 
 socket.on("questionUpdate", ({ question }) => {
-    console.log(question)
     showQuestion(question)
-})
-
-socket.on("scoreUpdate", ({ scores }) => {
-    updateScores(scores)
 })
 
 socket.on("display_empty", () => {
@@ -119,11 +143,6 @@ function buildBuzzer() {
 // ONLOAD
 
 // Loads de l'ancienne version
-// buildCountdown()
-// buildScoreBoard()
-// buildQuestionContainer()
 
-// buildPseudoInput() 
+// buildPseudoInput()
 // buildOpenQuestionContainer()
-
-

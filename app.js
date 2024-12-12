@@ -1,10 +1,10 @@
-const path = require('path')
-const http = require('http')
-const express = require('express')
-const socketio = require('socket.io')
-const hbs = require('hbs')
-const { questionSelector, questionSelectorGame } = require('./questionSelector')
-const loadQuestions = require('./loadQuestions')
+const path = require("path")
+const http = require("http")
+const express = require("express")
+const socketio = require("socket.io")
+const hbs = require("hbs")
+const { questionSelector, questionSelectorGame } = require("./questionSelector")
+const loadQuestions = require("./loadQuestions")
 
 const app = express()
 const server = http.createServer(app)
@@ -13,13 +13,13 @@ const io = socketio(server)
 const port = process.env.PORT || 3001
 
 // Define paths for Express config
-const publicDirectoryPath = path.join(__dirname, './public')
-const viewsPath = path.join(__dirname, './views')
-const partialsPath = path.join(__dirname, './views/partials')
+const publicDirectoryPath = path.join(__dirname, "./public")
+const viewsPath = path.join(__dirname, "./views")
+const partialsPath = path.join(__dirname, "./views/partials")
 
 // Setup handlebars engine and views location
-app.set('view engine', 'hbs')
-app.set('views', viewsPath)
+app.set("view engine", "hbs")
+app.set("views", viewsPath)
 hbs.registerPartials(partialsPath)
 
 // Setup static directory to serve
@@ -28,15 +28,8 @@ app.use(express.static(publicDirectoryPath))
 //
 
 const duration = 45 * 1000
-let remainingTime = duration
-let endTime = 0
-let isRunning = false
-let category
+
 let activeTeam
-let scores = {
-    teamA: 0,
-    teamB: 0
-}
 
 let allQuestions = []
 let questions = []
@@ -53,8 +46,14 @@ const elementStates = {
     answerInput: false,
     countdown: false,
     score: false,
+    currentCategory: "",
     currentQuestion: "",
     activePlayer: null,
+    remainingTime: duration,
+    endTime: 0,
+    isRunning: false,
+    scoreA: 0,
+    scoreB: 0,
 }
 
 /**
@@ -78,61 +77,59 @@ loadQuestions("karma_lpgqdf.csv")
     .catch((error) => console.error("Erreur lors du chargement des questions:", error))
 
 const pauseCount = () => {
-    if (!isRunning) return
-    isRunning = false
-    remainingTime = endTime - Date.now()
-    io.emit("chronoUpdate", { endTime, isRunning })
+    if (!elementStates.isRunning) return
+    elementStates.isRunning = false
+    elementStates.remainingTime = elementStates.endTime - Date.now()
+    io.emit("updateElementStates", elementStates)
 }
 
 const startCount = () => {
-    if (isRunning) return
-    isRunning = true
-    endTime = Date.now() + remainingTime
-    io.emit("chronoUpdate", { endTime, isRunning })
+    if (elementStates.isRunning) return
+    elementStates.isRunning = true
+    elementStates.endTime = Date.now() + elementStates.remainingTime
+    io.emit("updateElementStates", elementStates)
 }
 
 const resetCount = () => {
-    isRunning = false
-    remainingTime = duration
-    endTime = Date.now() + remainingTime
-    io.emit("chronoUpdate", { endTime, isRunning })
+    elementStates.isRunning = false
+    elementStates.remainingTime = duration
+    elementStates.endTime = Date.now() + elementStates.remainingTime
+    io.emit("updateElementStates", elementStates)
 }
 
 io.on("connection", (socket) => {
-    const userId = socket.id
-    console.log("Un utilisateur s'est connecté: " + userId)
-
-    socket.emit("updateElementStates", elementStates)
-    socket.emit("checkUsername")
+    socket.on("getElementStates", () => {
+        socket.emit("updateElementStates", elementStates)
+    })
 
     socket.on("join", (pseudo) => {
         socket.userData = { id: socket.id, pseudo }
         connectedUsers[socket.id] = socket.userData
-        console.log("User joined:", connectedUsers[socket.id]) // Vérifie que l'utilisateur est bien ajouté
+        console.log("User joined:", connectedUsers[socket.id])
         io.emit("connectedPlayers", Object.values(connectedUsers))
         socket.emit("updateElementStates", elementStates)
     })
 
-    if (!isRunning) {
-        endTime = Date.now() + remainingTime
-    }
+    // socket.emit("updateElementStates", elementStates)
+
+    // if (!isRunning) {
+    //     endTime = Date.now() + remainingTime
+    // }
     // endTime = Date.now() + remainingTime
 
     // Seulement au client qui vient de se connecter
     // socket.emit("updateElementStates", elementStates)
 
-    if (elementStates.round == 1) socket.emit("display_round1")
-    if (elementStates.round == 2) socket.emit("display_round2")
+    // if (elementStates.round == 1) socket.emit("display_round1")
+    // if (elementStates.round == 2) socket.emit("display_round2")
 
     // À tous les clients
-    io.emit("chronoUpdate", { endTime, isRunning })
-    io.emit("scoreUpdate", { scores })
+    // io.emit("chronoUpdate", { endTime, isRunning })
     // io.emit("questionUpdate", { question: selectedQuestions[questionIndex] }) // on reload
-    io.emit("displayCategory", { category })
-    io.emit("teamUpdate", { activeTeam })
+    // io.emit("teamUpdate", { activeTeam })
 
     socket.on("start", ({ startTeam }) => {
-        if (!category) {
+        if (!elementStates.currentCategory) {
             socket.emit("displayError", {
                 error: "Veuillez choisir une catégorie",
             })
@@ -147,91 +144,83 @@ io.on("connection", (socket) => {
 
         let firstQuestion = 0
         if (activeTeam == "B") firstQuestion = +5
-        selectedQuestions = questionSelectorGame(questions, category, firstQuestion)
-        io.emit("questionUpdate", {
-            question: selectedQuestions[questionIndex],
-        })
+        selectedQuestions = questionSelectorGame(questions, elementStates.currentCategory, firstQuestion)
+        elementStates.currentQuestion = selectedQuestions[questionIndex]
+        io.emit("updateElementStates", elementStates)
         firstQuestion = 0
     })
 
     socket.on("draw", () => {
-        if (!category) {
+        if (!elementStates.currentCategory) {
             socket.emit("displayError", {
                 error: "Veuillez choisir une catégorie",
             })
             return
         }
 
-        selectedQuestions = questionSelectorGame(questions, category, 10)
-        io.emit("questionUpdate", {
-            question: selectedQuestions[questionIndex],
-        })
-    })
-
-    socket.on("requestQuestion", () => {
-        io.emit("receiveQuestion", {
-            question: questionSelector(allQuestions, null, 1)[0],
-        })
+        selectedQuestions = questionSelectorGame(questions, elementStates.currentCategory, 10)
+        elementStates.currentQuestion = selectedQuestions[questionIndex] // TODO: pas la 11ème à tous les coups ?
+        io.emit("updateElementStates", elementStates)
     })
 
     socket.on("pause", () => {
         pauseCount()
     })
 
-    socket.on("reset", () => {
-        // RESET TIME
-        resetCount()
+    socket.on("resetTime", () => {
         activeTeam = null
         io.emit("teamUpdate", { activeTeam })
         questionIndex = 0
         selectedQuestions = []
-        io.emit("questionUpdate", { question: null })
+        elementStates.currentQuestion = ""
+        io.emit("soundOff")
+        resetCount() // emit("updateElementStates", elementStates)
     })
 
     socket.on("resetScore", () => {
-        scores.teamA = 0
-        scores.teamB = 0
-        io.emit("scoreUpdate", { scores })
+        elementStates.scoreA = 0
+        elementStates.scoreB = 0
+        io.emit("updateElementStates", elementStates)
     })
 
     socket.on("category", ({ newCategory }) => {
-        category = newCategory
-        io.emit("displayCategory", { category })
+        elementStates.currentCategory = newCategory
+        io.emit("updateElementStates", elementStates)
     })
 
     socket.on("decision", ({ decision }) => {
-        if (decision == "wrong" && isRunning) {
+        if (decision == "wrong" && elementStates.isRunning) {
             pauseCount()
-        } else if (decision == "wrong" && !isRunning) {
+        } else if (decision == "wrong" && !elementStates.isRunning) {
             startCount()
             questionIndex++
         }
 
         if (questionIndex < 5 + 1) {
             if (decision == "right") {
-                if (activeTeam == "A") scores.teamA += 1
-                if (activeTeam == "B") scores.teamB += 1
+                if (activeTeam == "A") elementStates.scoreA += 1
+                if (activeTeam == "B") elementStates.scoreB += 1
                 startCount()
                 questionIndex++
             }
             if (decision == "steal") {
-                if (activeTeam == "A") scores.teamB += 2 // 2 points pour voler
-                if (activeTeam == "B") scores.teamA += 2
+                if (activeTeam == "A") elementStates.scoreB += 2 // 2 points pour voler
+                if (activeTeam == "B") elementStates.scoreA += 2
                 startCount()
                 questionIndex++
             }
-            io.emit("scoreUpdate", { scores })
+            socket.emit("updateElementStates", elementStates)
         }
 
         if (questionIndex < 5) {
-            io.emit("questionUpdate", {
-                question: selectedQuestions[questionIndex],
-            })
+            elementStates.currentQuestion = selectedQuestions[questionIndex]
+            io.emit("updateElementStates", elementStates)
         }
 
         if (questionIndex == 5) {
             pauseCount()
-            io.emit("questionUpdate", { question: null })
+            elementStates.currentQuestion = ""
+            io.emit("updateElementStates", elementStates)
             io.emit("soundOff")
             setTimeout(function () {
                 resetCount()
@@ -239,7 +228,8 @@ io.on("connection", (socket) => {
                 io.emit("teamUpdate", { activeTeam })
                 questionIndex = 0
                 selectedQuestions = []
-                io.emit("questionUpdate", { question: null })
+                elementStates.currentQuestion = ""
+                io.emit("updateElementStates", elementStates)
             }, 10000)
         }
     })
@@ -249,32 +239,28 @@ io.on("connection", (socket) => {
     socket.on("display_empty", () => {
         elementStates.round = 0
         io.emit("updateElementStates", elementStates)
-        io.emit("checkUsername")
     })
 
     socket.on("display_round1", () => {
         elementStates.round = 1
         io.emit("updateElementStates", elementStates)
-        io.emit("checkUsername")
     })
 
     socket.on("display_round2", () => {
         elementStates.round = 2
         io.emit("updateElementStates", elementStates)
-        io.emit("checkUsername")
     })
 
     socket.on("changeElementVisibility", ({ elementId, isVisible }) => {
         elementStates[elementId] = isVisible
         io.emit("updateElementStates", elementStates)
-        io.emit("checkUsername")
     })
 
-    // Questions ouvertes
+    // Gestion des questions #########
 
     socket.on("sendQuestion", (question) => {
         elementStates.currentQuestion = question.question
-        io.emit("questionUpdate", question.question)
+        io.emit("updateElementStates", elementStates)
     })
 
     socket.on("sendAnswer", (answer) => {
@@ -288,9 +274,15 @@ io.on("connection", (socket) => {
         }
     })
 
+    socket.on("requestQuestion", () => {
+        io.emit("receiveQuestion", {
+            question: questionSelector(allQuestions, null, 1)[0],
+        })
+    })
+
     // Gestion des utilisateurs connectés
 
-    socket.on("hostConnected", () => {
+    socket.on("getConnectedHosts", () => {
         socket.emit("connectedPlayers", Object.values(connectedUsers))
     })
 
@@ -307,13 +299,35 @@ io.on("connection", (socket) => {
     socket.on("activateBuzzer", () => {
         elementStates.buzzerActive = true
         io.emit("updateElementStates", elementStates)
-        io.emit("checkUsername")
     })
 
     socket.on("playerBuzzed", ({ pseudo }) => {
         if (!elementStates.buzzerActive) return // pour empêcher les quasi simultanés
         elementStates.buzzerActive = false
         io.emit("buzzed", pseudo)
+    })
+
+    // Gestion des fichiers de questionnaires
+
+    socket.on("changeQuestionFile", ({ fileName }) => {
+        console.log(`Chargement du fichier de questions: ${fileName}`)
+        loadQuestions(fileName)
+            .then((loadedQuestions) => {
+                questions = loadedQuestions
+                questionsLoaded = true
+                console.log(questions.length + " questions chargées")
+
+                activeTeam = null
+                io.emit("teamUpdate", { activeTeam })
+                questionIndex = 0
+                selectedQuestions = []
+                elementStates.currentQuestion = ""
+                elementStates.currentCategory = ""
+                elementStates.scoreA = 0
+                elementStates.scoreB = 0
+                io.emit("updateElementStates", elementStates)
+            })
+            .catch((error) => console.error("Erreur lors du chargement des questions:", error))
     })
 
     // Gestion du chrono
@@ -325,17 +339,11 @@ io.on("connection", (socket) => {
             io.emit("teamUpdate", { activeTeam: null })
             questionIndex = 0
             selectedQuestions = []
-            io.emit("questionUpdate", { question: null })
+            elementStates.currentQuestion = ""
+            io.emit("updateElementStates", elementStates)
         }, 5000)
     })
 })
-
-// app.get("/", (req, res) => {
-//     res.render("index", {
-//         layout: "layouts/main",
-//         demo: "hello world : /real, /host & /player",
-//     })
-// })
 
 app.get("/", (req, res) => {
     res.render("player", {
@@ -349,36 +357,37 @@ app.get("/real", (req, res) => {
         questions,
         questionsElim: questionSelector(questions, "eli"),
         questionsFinale: questionSelector(questions, "fin"),
+        elementStates,
     })
 })
 
-app.get('/host', (req, res) => {
-    res.render('host', {
-        layout: 'layouts/main',
+app.get("/host", (req, res) => {
+    res.render("host", {
+        layout: "layouts/main",
     })
 })
 
-app.get('/builder', (req, res) => {
-    res.render('builder', {
-        layout: 'layouts/main',
+app.get("/builder", (req, res) => {
+    res.render("builder", {
+        layout: "layouts/main",
     })
 })
-
-
 
 server.listen(port, () => {
-    console.log(`server is up on port ${ port }`)
+    console.log(`server is up on port ${port}`)
 })
-
 
 // TODO - Tout reprendre
 // [x] Garder l'état de la manche actuelle côté serveur
 //      [x] Accueil : auth ou logo
 //      [x] Manche 1 : auth ou buzzers
+//              [] UI buzzers
 //      [] Manche 2 : écran spécial
 //              [] 5 thèmes
-//              [] Loader de partie
+//              [x] Loader de partie
 //              [] Afficher toutes les questions de la manche
+//              [] Pourquoi le chrono à 00:00 on refresh
+//              [] Garder les points on refresh (actuellement, efface sur celui qui refresh et actualise les autres)
 //      [] Finale : écran spécial + système de vote
 // [] QR code pour url locale ?
 // [x] Héberger !!!
@@ -400,7 +409,7 @@ server.listen(port, () => {
 // [x] raccourcis clavier
 // [x] sons
 // [x] vérifier tous les états au refresh (chrono, question active, catégorie active, équipe active, scores)
-// [x] reset scores 
+// [x] reset scores
 // [] ajouter les ID de questions ?
 // [] néon ui : https://css-tricks.com/how-to-create-neon-text-with-css/
 // [] créer un préparateur de questionnaires (donner 15 questions à équilibrer en deux séries de 5 et une éliminatoire, permettre la modification)

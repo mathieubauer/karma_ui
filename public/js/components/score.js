@@ -36,7 +36,7 @@ function buildScoreBoard() {
     }
 }
 
-function updateScores(scores) {
+function updateScores(scoreA, scoreB) {
     const teamAScoreElement = document.querySelector("#teamA .score")
     const teamBScoreElement = document.querySelector("#teamB .score")
 
@@ -47,24 +47,20 @@ function updateScores(scores) {
         teamBScoreElement.innerHTML = ""
     }
 
-    for (let i = 0; i < scores.teamA; i++) {
+    for (let i = 0; i < scoreA; i++) {
         const point = document.createElement("div")
         point.classList.add("point", "rounded-circle", "bg-success", "m-1")
         point.style.height = "20px"
         point.style.width = "20px"
         document.querySelector("#teamA .score").appendChild(point)
     }
-    for (let i = 0; i < scores.teamB; i++) {
+    for (let i = 0; i < scoreB; i++) {
         const point = document.createElement("div")
         point.classList.add("point", "rounded-circle", "bg-success", "m-1")
         point.style.height = "20px"
         point.style.width = "20px"
         document.querySelector("#teamB .score").appendChild(point)
     }
-
-    // Fonction pour mettre à jour les scores, équivalent de la partie socket.on('scoreUpdate', ...) précédente
-    // document.querySelector('#teamA .score').textContent = `Score: ${ scores.teamA }`
-    // document.querySelector('#teamB .score').textContent = `Score: ${ scores.teamB }`
 }
 
 export { buildScoreBoard, updateScores }
