@@ -5,13 +5,22 @@ class ElementBuilder {
         this.element = document.createElement(tag)
     }
 
-    setAttribute(name, value) {
-        this.element.setAttribute(name, value)
+    setId(id) {
+        this.element.id = id
         return this
     }
 
-    addClass(...classNames) {
-        this.element.classList.add(...classNames)
+    addClass(classNames) {
+        if (typeof classNames === "string") {
+            this.element.classList.add(...classNames.split(/\s+/))
+        } else {
+            throw new Error("addClass expects a string of space-separated class names.")
+        }
+        return this
+    }
+
+    setAttribute(name, value) {
+        this.element.setAttribute(name, value)
         return this
     }
 

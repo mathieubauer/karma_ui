@@ -1,34 +1,30 @@
 import socket from "./socket.js"
 import { showToast } from "./toast.js"
+import ElementBuilder from "./ElementBuilder.js"
 
 function buildQuestionContainer() {
+    const questionContainer = new ElementBuilder("div")
+        .setId("questionContainer") //
+        .build()
 
-    const questionCategory = document.createElement("div")
-    questionCategory.id = "question-category"
-    questionCategory.className = "text-center fs-3 mt-5 fw-bold text-warning"
-    questionCategory.style.minHeight = "50px"
+    const statementDiv = new ElementBuilder("div")
+        .setId("question") //
+        .build()
 
-    const questionContainer = document.createElement("div")
-    questionContainer.id = "question-container"
-    questionContainer.className = "px-5 border rounded-5 d-flex align-items-center justify-content-center"
-    questionContainer.style.minHeight = "200px"
+    const categoryDiv = new ElementBuilder("div")
+        .setId("question-category") //
+        .build()
 
-    const questionText = document.createElement("div")
-    questionText.id = "question"
-    questionText.className = "fw-bold fs-3z"
-    // questionText.style.fontSize = "clamp(24px, 5vw, 40px)"
-    questionText.style.cssText = "font-size: clamp(24px, 4vw, 40px);"
+    questionContainer.appendChild(statementDiv)
+    questionContainer.appendChild(categoryDiv)
 
-    questionContainer.appendChild(questionText)
-    page.appendChild(questionCategory)
-    page.appendChild(questionContainer)
+    return questionContainer
 }
 
 function buildOpenQuestionContainer() {
     const questionContainer = document.createElement("div")
     questionContainer.id = "question"
-    questionContainer.className =
-        "mt-5 px-5 border d-flex align-items-center justify-content-center"
+    questionContainer.className = "mt-5 px-5 border d-flex align-items-center justify-content-center"
     questionContainer.style.minHeight = "200px"
 
     const form = document.createElement("form")

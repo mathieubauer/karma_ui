@@ -1,45 +1,49 @@
+import ElementBuilder from "./ElementBuilder.js"
+
 function buildScoreBoard() {
-    // page ?
-
-    // Créez l'élément <hr>
-    const hr = document.createElement("hr")
-
-    // Créez le conteneur principal <div>
-    const scoreContainer = document.createElement("div")
-    scoreContainer.id = "score-container"
-    scoreContainer.className = "text-center d-flex"
+    const scoreContainer = new ElementBuilder("div") //
+        .setId("scoreContainer")
+        .addClass("text-center d-flex")
+        .build()
 
     const names = ["A", "B"]
 
     for (let i = 0; i < names.length; i++) {
-        const teamDiv = document.createElement("div")
-        teamDiv.id = `team${names[i]}`
-        teamDiv.className = "fw-bold fs-3 col-6"
+        const teamDiv = new ElementBuilder("div") //
+            .setId(`team${names[i]}`)
+            .addClass("teamArea")
+            .build()
 
-        const nameDiv = document.createElement("div")
-        nameDiv.textContent = `Équipe ${names[i]}`
+        const nameDiv = new ElementBuilder("div") //
+            .addClass("teamName")
+            .setText(`Équipe ${names[i]}`)
+            .build()
+
+        const scoreDiv = new ElementBuilder("div") //
+            .addClass("teamScore")
+            .build()
+
         teamDiv.appendChild(nameDiv)
-
-        const scoreDiv = document.createElement("div")
-        scoreDiv.className = "score d-flex justify-content-center"
-        scoreDiv.style.minHeight = "28px"
         teamDiv.appendChild(scoreDiv)
 
         scoreContainer.appendChild(teamDiv)
     }
 
-    const mainContainer = document.querySelector("#scoreContainer")
-    if (mainContainer) {
-        mainContainer.appendChild(scoreContainer)
-    } else {
-        page.appendChild(scoreContainer)
-    }
+    return scoreContainer
 }
 
 function updateScores(scoreA, scoreB) {
-    const teamAScoreElement = document.querySelector("#teamA .score")
-    const teamBScoreElement = document.querySelector("#teamB .score")
+    const teamAScoreElement = document.querySelector("#teamA .teamScore")
+    const teamBScoreElement = document.querySelector("#teamB .teamScore")
 
+    if (teamAScoreElement) {
+        teamAScoreElement.innerHTML = scoreA
+    }
+    if (teamBScoreElement) {
+        teamBScoreElement.innerHTML = scoreB
+    }
+
+    /*
     if (teamAScoreElement) {
         teamAScoreElement.innerHTML = ""
     }
@@ -61,6 +65,7 @@ function updateScores(scoreA, scoreB) {
         point.style.width = "20px"
         document.querySelector("#teamB .score").appendChild(point)
     }
+    */
 }
 
 export { buildScoreBoard, updateScores }

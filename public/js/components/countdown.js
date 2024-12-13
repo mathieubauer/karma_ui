@@ -1,31 +1,22 @@
 import socket from "./socket.js"
+import ElementBuilder from "./ElementBuilder.js"
 
 let countdownInterval
 
 function buildCountdown(time) {
     const { minutes, seconds, centiseconds } = formatTime(time)
 
-    const displayContainer = document.createElement("div")
-    displayContainer.id = "display"
-    displayContainer.className = "font-monospace"
+    const secondsSpan = new ElementBuilder("span").addClass("seconds").setText(`${minutes}:${seconds}`).build()
 
-    const secondsSpan = document.createElement("span")
-    secondsSpan.className = "seconds"
-    secondsSpan.textContent = `${minutes}:${seconds}`
+    const centisecondsSpan = new ElementBuilder("span").addClass("centiseconds").setText(`.${centiseconds}`).build()
 
-    const centisecondsSpan = document.createElement("span")
-    centisecondsSpan.className = "centiseconds"
-    centisecondsSpan.textContent = `.${centiseconds}`
+    const countdownContainer = new ElementBuilder("div")
+        .setId("countdownContainer")
+        .addChild(secondsSpan)
+        .addChild(centisecondsSpan)
+        .build()
 
-    displayContainer.appendChild(secondsSpan)
-    displayContainer.appendChild(centisecondsSpan)
-
-    const countdownContainer = document.querySelector("#countdownContainer")
-    if (countdownContainer) {
-        countdownContainer.appendChild(displayContainer)
-    } else {
-        page.appendChild(displayContainer)
-    }
+    return countdownContainer
 }
 
 function updateCountdown(time) {

@@ -1,14 +1,14 @@
-// page est défini dans le fichier appelant
+import ElementBuilder from "./ElementBuilder.js"
 
 function buildLogo() {
-    const img = document.createElement("img")
-    img.src = "img/logo.png"
-    img.alt = "logo karma"
-    img.classList.add("img-fluid")
-    img.style.width = "100%"
-    img.style.height = "auto"
-    img.style.objectFit = "contain"
-    page.appendChild(img)
+    const logo = new ElementBuilder("img")
+        .setAttribute("src", "img/logo.png")
+        .setAttribute("alt", "logo karma")
+        .addClass("img-fluid")
+        .setAttribute("style", "width: 100%; height: auto; object-fit: contain;")
+        .build()
+
+    return logo
 }
 
 export { buildLogo }

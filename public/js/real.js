@@ -38,8 +38,10 @@ socket.on("updateElementStates", (elementStates) => {
     }
 
     if (elementStates.isRunning !== undefined && elementStates.remainingTime !== undefined && elementStates.endTime !== undefined) {
-        document.querySelector("#countdownContainer").innerHTML = ""
-        buildCountdown()
+        const realCountdown = document.querySelector("#realCountdown")
+        realCountdown.innerHTML = ""
+        // document.querySelector('#realCountdown').appendChild(buildCountdown(elementStates.remainingTime))
+        realCountdown.appendChild(buildCountdown())
         if (elementStates.isRunning) {
             startCountdown(elementStates.endTime)
         } else {
@@ -48,8 +50,9 @@ socket.on("updateElementStates", (elementStates) => {
     }
 
     if (elementStates.scoreA !== undefined && elementStates.scoreB !== undefined) {
-        document.querySelector("#scoreContainer").innerHTML = ""
-        buildScoreBoard()
+        const realScoreboard = document.querySelector("#realScoreboard")
+        realScoreboard.innerHTML = ""
+        realScoreboard.appendChild(buildScoreBoard())
         updateScores(elementStates.scoreA, elementStates.scoreB)
     }
 
@@ -66,6 +69,10 @@ socket.on("updateElementStates", (elementStates) => {
         document.querySelector("#right").disabled = false
         document.querySelector("#wrong").disabled = false
         document.querySelector("#steal").disabled = false
+    }
+
+    if (elementStates.activePlayer !== undefined) {
+        document.getElementById("buzzResultsContainer").innerHTML = elementStates.activePlayer
     }
 })
 
@@ -264,10 +271,6 @@ document.getElementById("questionFileForm").addEventListener("submit", (e) => {
 
 document.getElementById("activateBuzzerBtn").addEventListener("click", () => {
     socket.emit("activateBuzzer")
-})
-
-socket.on("buzzed", (pseudo) => {
-    document.getElementById("buzzResultsContainer").innerHTML = pseudo
 })
 
 // ########## Gestion du son ##########

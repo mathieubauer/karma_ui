@@ -5,7 +5,7 @@ import { buildOpenQuestionContainer, buildQuestionContainer } from "./components
 import { buildLogo } from "./components/logo.js"
 import { buildPseudoInput, checkUsername } from "./components/pseudo.js"
 
-const page = document.querySelector("#page")
+const page = document.querySelector(".mainContainer")
 
 const categoryMap = {
     aca: "Savoirs académiques",
@@ -31,7 +31,7 @@ if (pseudo) {
 // Gestion des affichages
 
 socket.on("updateElementStates", (elementStates) => {
-    console.log(elementStates)
+    // console.log(elementStates)
     localElementStates = elementStates
     page.innerHTML = ""
 
@@ -47,21 +47,22 @@ socket.on("updateElementStates", (elementStates) => {
         }
 
         if (elementStates.round == 2) {
-            buildCountdown(elementStates.remainingTime)
+            page.appendChild(buildCountdown(elementStates.remainingTime))
             if (elementStates.isRunning) {
                 startCountdown(elementStates.endTime)
             } else {
                 pauseCountdown(elementStates.remainingTime)
             }
 
-            buildScoreBoard()
-            updateScores(elementStates.scoreA, elementStates.scoreB)
-
-            buildQuestionContainer()
+            page.appendChild(buildQuestionContainer())
             if (elementStates.currentCategory) {
                 document.querySelector("#question-category").textContent = categoryMap[elementStates.currentCategory]
             }
             showQuestion(elementStates.currentQuestion)
+
+            page.appendChild(buildScoreBoard())
+            updateScores(elementStates.scoreA, elementStates.scoreB)
+
             return
         }
     }
@@ -72,7 +73,7 @@ socket.on("updateElementStates", (elementStates) => {
     })
 
     if (page.innerHTML == "") {
-        buildLogo()
+        page.appendChild(buildLogo())
     }
 })
 

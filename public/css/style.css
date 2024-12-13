@@ -1,3 +1,128 @@
-#page-container.player {
-    background-image: url("/img/bg.png") ;
+#buzzerButton {
+    width: 80vw; /* 80% de la largeur de l'écran */
+    max-width: 300px; /* Limitation en pixels */
+    height: 80vw;
+    max-height: 300px;
+    border-radius: 50%; /* Rond parfait */
+    background-color: #e60000; /* Rouge actif */
+    border: none;
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    text-indent: -9999px; /* Cache le texte */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: box-shadow 0.1s ease;
+}
+
+#buzzerButton:disabled {
+    background-color: #aaa; /* Gris inactif */
+    pointer-events: none;
+    box-shadow: none; /* Pas d'ombre sur inactif */
+}
+
+#buzzerButton:active {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Effet enfoncé */
+}
+
+#buzzerButton.first {
+    background-color: gold;
+}
+
+.toast {
+    max-width: 9999px !important;
+}
+
+.responsive-font {
+    font-size: clamp(24px, 5vw, 40px);
+}
+
+/* Player view */
+
+#player {
+    background-image: url("/img/bg.png");
+    height: 100svh;
+}
+
+#player #countdownContainer {
+    height: 20svh;
+    font-family: monospace;
+    display: flex;
+    justify-content: center;
+    align-items:last baseline;
+    padding: 15px;
+}
+
+#player .seconds {
+    font-size: calc(1.625rem + 4.5vw); /* Responsive font ; Bootstrap display-1 */
+}
+
+#player .centiseconds {
+    font-size: calc(1.475rem + 2.7vw); /* Responsive font ; Bootstrap display-4 */
+}
+
+#player #questionContainer {
+    height: 60svh;
+    padding: 0 3rem; /* Responsive padding ; Bootstrap px-5 */
+}
+
+#player #questionContainer #question {
+    height: 75%;
+    font-size: clamp(20px, 4vw, 40px);
+    font-weight: bold;
+    border: white 2px solid;
+    border-radius: 2rem; /* Responsive border-radius ; Bootstrap rounded-5 */
+    padding: 1rem; /* Responsive padding ; Bootstrap p-3 */
+    padding: 1.5rem; /* Responsive padding ; Bootstrap p-4 */
+}
+
+#player #questionContainer #question-category {
+    height: 25%;
+    padding: 1rem; /* Responsive padding ; Bootstrap p-3 */
+    display: flex;
+    align-items: top;
+    justify-content: center;
+    font-size: calc(1.3rem + 0.6vw) !important; /* Responsive font ; Bootstrap fs-3 */
+    font-weight: bold;
+    color: #ffc107; /* Bootstrap yellow/warning */
+}
+
+
+#player #scoreContainer {
+    height: 20svh;
+    padding: 1rem; /* Responsive padding ; Bootstrap p-3 */
+}
+
+#player #scoreContainer .teamArea {
+    flex: 0 0 auto;
+    width: 50%; /* Responsive width ; Bootstrap col-6 */
+    font-weight: bold !important;
+    display: flex;
+    justify-content: center;
+    align-items:last baseline;
+}
+
+#player #scoreContainer .teamName {
+    font-size: calc(1.3rem + 0.6vw) !important; /* Responsive font ; Bootstrap fs-3 */
+    margin: 0 1.5rem; /* Responsive padding ; Bootstrap px-4 */
+}
+
+#player #scoreContainer .teamScore {
+    font-size: calc(1.375rem + 1.5vw) !important; /* Responsive font ; Bootstrap fs-1 */
+    font-size: calc(1.475rem + 2.7vw) !important; /* Responsive font ; Bootstrap display-4 */
+    color: #ffc107; /* Bootstrap yellow/warning */
+}
+
+#player #scoreContainer #teamB .teamName {
+    order: 1;
+}
+
+#player #scoreContainer #teamB .teamScore {
+    order: 0;
+}
+
+/* Real view */
+
+#realCountdown {
+    font-family: monospace;
+    font-size: calc(1.3rem + 0.6vw) !important; /* Responsive font ; Bootstrap fs-3 */
 }

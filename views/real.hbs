@@ -1,4 +1,4 @@
-<div id="page" class="container-fluid p-4">
+<div id="real" class="mainContainer container-fluid p-4">
 
     {{! ACCUEIL ########## }}
 
@@ -62,17 +62,16 @@
 
         <div class="col-md-10 text-start">
 
-            
-            <button type="button" id="requestQuestion" class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
-                Question au hasard
-            </button>
-
             <div class="d-flex align-items-center mb-2">
                 <button type="button" id="activateBuzzerBtn" class="btn btn-secondary p-2 text-uppercase fw-bold">
                     Activer les buzzers
                 </button>
                 <div id="buzzResultsContainer" class="ms-4"></div>
             </div>
+
+            <button type="button" id="requestQuestion" class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
+                Question au hasard
+            </button>
 
             <table border="1" id="tableau" class="table mb-2" style="height: 100px;">
                 <tr>
@@ -123,14 +122,14 @@
 
                     <button type="button" id="draw" class="btn btn-secondary me-2 mb-2 p-2 text-uppercase fw-bold">Si égalité</button>
                     {{! <button type="button" id="pause"
-                class="btn btn-primary me-2 mb-2 p-2 text-uppercase fw-bold">Pause</button>
-            }}
+                        class="btn btn-primary me-2 mb-2 p-2 text-uppercase fw-bold">Pause</button>
+                    }}
                     <button type="button" id="resetTime" class="btn btn-outline-danger me-2 mb-2 p-2 text-uppercase fw-bold">Reset time</button>
 
-                    <div id="countdownContainer" class="fs-2"></div>
+                    <div id="realCountdown"></div>
                 </div>
                 <div class="col-6">
-                    <div id="scoreContainer"></div>
+                    <div id="realScoreboard"></div>
                 </div>
             </div>
 

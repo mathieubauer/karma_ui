@@ -1,7 +1,7 @@
 import socket from "./socket.js"
 import { showToast } from "./toast.js"
 
-const page = document.querySelector("#page")
+const page = document.querySelector(".mainContainer")
 
 function checkUsername() {
     const savedPseudo = localStorage.getItem("pseudo")

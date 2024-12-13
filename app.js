@@ -298,13 +298,15 @@ io.on("connection", (socket) => {
 
     socket.on("activateBuzzer", () => {
         elementStates.buzzerActive = true
+        elementStates.activePlayer = ""
         io.emit("updateElementStates", elementStates)
     })
 
     socket.on("playerBuzzed", ({ pseudo }) => {
         if (!elementStates.buzzerActive) return // pour empêcher les quasi simultanés
         elementStates.buzzerActive = false
-        io.emit("buzzed", pseudo)
+        elementStates.activePlayer = pseudo
+        io.emit("updateElementStates", elementStates)
     })
 
     // Gestion des fichiers de questionnaires
@@ -386,17 +388,19 @@ server.listen(port, () => {
 //              [] 5 thèmes
 //              [x] Loader de partie
 //              [] Afficher toutes les questions de la manche
-//              [] Pourquoi le chrono à 00:00 on refresh
-//              [] Garder les points on refresh (actuellement, efface sur celui qui refresh et actualise les autres)
+//              [x] Pourquoi le chrono à 00:00 on refresh
+//              [x] Garder les points on refresh (actuellement, efface sur celui qui refresh et actualise les autres)
 //      [] Finale : écran spécial + système de vote
 // [] QR code pour url locale ?
 // [] Revoir les questions des parties ; reprendre des parties à 5 thèmes
+// [] Système de mot de passe / kick ban des utilisateurs
 // [x] Héberger !!!
 // [] Faire une première manche avec 20 questions sélectionnées
 //      [] Les tester dans questions_v3 / quiz
 //      [] Base de donneés ? Mongoose ? Ou dans Questions ?
 // [] rendre beau côté /real
 // [] compter les points : système de réponses attendues tolérant + comptage de points manuel (ajouter / enlever)
+// [] beau chrono : https://css-tricks.com/how-to-create-an-animated-countdown-timer-with-html-css-and-javascript/
 
 // TODO
 // [x] bootstrap hors ligne

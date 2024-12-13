@@ -1,52 +1,15 @@
 <style>
-    .seconds { font-size: 5rem; }
-    .centiseconds { font-size: 3rem; }
 
-    #buzzerButton {
-        width: 80vw;            /* 80% de la largeur de l'écran */
-        max-width: 300px;       /* Limitation en pixels */
-        height: 80vw;
-        max-height: 300px;
-        border-radius: 50%;     /* Rond parfait */
-        background-color: #e60000; /* Rouge actif */
-        border: none;
-        position: relative;
-        display: inline-block;
-        overflow: hidden;
-        text-indent: -9999px;   /* Cache le texte */
-        box-shadow: 0 0 10px rgba(0,0,0,0.3);
-        transition: box-shadow 0.1s ease;
-    }
-
-    #buzzerButton:disabled {
-        background-color: #aaa; /* Gris inactif */
-        pointer-events: none;
-        box-shadow: none;       /* Pas d'ombre sur inactif */
-    }
-
-    #buzzerButton:active {
-        box-shadow: 0 0 5px rgba(0,0,0,0.3); /* Effet enfoncé */
-    }
-
-    #buzzerButton.first {
-        background-color: gold;
-    }
-
-    .toast {
-        max-width: 9999px !important;
-    }
-
-    .responsive-font {
-        font-size: clamp(24px, 5vw, 40px);
-    }
 
 </style>
 
-<div id="page-container" class="d-flex justify-content-center align-items-center vw-100 player" style="height: 100svh;">
-    <div id="page" class="text-center vw-100 p-5">
+{{!-- <div id="page-container" class="d-flex justify-content-center align-items-center vw-100 player" style="height: 100svh;">
+    <div id="page" class="text-center vw-100 p-3">
         <div id="countdownContainer" class="mb-5"></div>
     </div>
-</div>
+</div> --}}
+
+<div id="player" class="mainContainer"></div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script type="module" src="/js/player.js"></script>
