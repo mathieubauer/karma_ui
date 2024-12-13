@@ -2,8 +2,8 @@
 
 #buzzerMount {
     background-color: #252525;
-    width: 30rem;
-    height: 30rem;
+    width: 22rem;
+    height: 22rem;
     margin-left: auto;
     margin-right: auto;
     margin-top: 40px;
@@ -13,8 +13,8 @@
 
 #base {
     background-color: #151515;
-    width: 26rem;
-    height: 26rem;
+    width: 18rem;
+    height: 18rem;
     margin-left: auto;
     margin-right: auto;
     top: 2rem;
@@ -26,8 +26,8 @@
 
 
 #buzzerButton {
-    width: 25rem;
-    height: 25rem;
+    width: 17rem;
+    height: 17rem;
     margin: 0;
     padding: 0;
     border: 0;
