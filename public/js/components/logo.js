@@ -1,14 +1,21 @@
 import ElementBuilder from "./ElementBuilder.js"
 
 function buildLogo() {
+
+    const logoContainer = new ElementBuilder("div") //
+        .setId("fullPageContainer")
+        .build()
+
     const logo = new ElementBuilder("img")
+        .setId("logo")
         .setAttribute("src", "img/logo.png")
         .setAttribute("alt", "logo karma")
         .addClass("img-fluid")
-        .setAttribute("style", "width: 100%; height: auto; object-fit: contain;")
         .build()
 
-    return logo
+    logoContainer.appendChild(logo)
+
+    return logoContainer
 }
 
 export { buildLogo }

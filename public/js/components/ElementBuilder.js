@@ -24,6 +24,15 @@ class ElementBuilder {
         return this
     }
 
+    setBooleanAttribute(name, isEnabled) {
+        if (isEnabled) {
+            this.element.setAttribute(name, "")
+        } else {
+            this.element.removeAttribute(name)
+        }
+        return this
+    }
+
     setText(text) {
         this.element.textContent = text
         return this

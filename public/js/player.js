@@ -3,7 +3,8 @@ import { buildScoreBoard, updateScores } from "./components/score.js"
 import { buildCountdown, startCountdown, pauseCountdown, updateCountdown } from "./components/countdown.js"
 import { buildOpenQuestionContainer, buildQuestionContainer } from "./components/question.js"
 import { buildLogo } from "./components/logo.js"
-import { buildPseudoInput, checkUsername } from "./components/pseudo.js"
+import { buildPseudoInput } from "./components/pseudo.js"
+import { buildBuzzer } from "./components/buzzer.js"
 
 const page = document.querySelector(".mainContainer")
 
@@ -23,7 +24,7 @@ if (pseudo) {
     socket.emit("join", pseudo)
 } else {
     page.innerHTML = ""
-    buildPseudoInput()
+    page.appendChild(buildPseudoInput())
 }
 
 // #####
@@ -31,6 +32,13 @@ if (pseudo) {
 // Gestion des affichages
 
 socket.on("updateElementStates", (elementStates) => {
+    const pseudo = localStorage.getItem("pseudo")
+    if (!pseudo) {
+        page.innerHTML = ""
+        page.appendChild(buildPseudoInput())
+        return
+    }
+
     // console.log(elementStates)
     localElementStates = elementStates
     page.innerHTML = ""
@@ -42,7 +50,7 @@ socket.on("updateElementStates", (elementStates) => {
 
     if (elementStates.round || elementStates.round == 0) {
         if (elementStates.round == 1) {
-            buildBuzzer()
+            page.appendChild(buildBuzzer(elementStates))
             return
         }
 
@@ -101,19 +109,7 @@ socket.on("display_empty", () => {
 socket.on("buzzerOn", () => {
     const buzzerButton = document.getElementById("buzzerButton")
     if (buzzerButton) {
-        buzzerButton.disabled = false
-    }
-})
-
-socket.on("buzzed", (pseudo) => {
-    const buzzerButton = document.getElementById("buzzerButton")
-    if (buzzerButton) {
-        buzzerButton.disabled = true
-    }
-
-    const savedPseudo = localStorage.getItem("pseudo")
-    if (savedPseudo == pseudo) {
-        buzzerButton.classList.add("first")
+        buzzerButton.setAttribute("data-disabled", false)
     }
 })
 
@@ -124,21 +120,6 @@ function showQuestion(question) {
     if (questionElement) {
         questionElement.innerHTML = question ? question.question : ""
     }
-}
-
-// à passer dans un constructeur de buzzer dédié
-
-function buildBuzzer() {
-    const buzzerButton = document.createElement("button")
-    buzzerButton.id = "buzzerButton"
-    buzzerButton.disabled = !localElementStates.buzzerActive
-    page.appendChild(buzzerButton)
-
-    buzzerButton.addEventListener("click", () => {
-        const pseudo = localStorage.getItem("pseudo") || "Anonymous"
-        socket.emit("playerBuzzed", { pseudo })
-        buzzerButton.disabled = true
-    })
 }
 
 // ONLOAD

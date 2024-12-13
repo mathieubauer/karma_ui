@@ -1,32 +1,86 @@
+/* BUZZER UI */
+
+#buzzerMount {
+    background-color: #252525;
+    width: 30rem;
+    height: 30rem;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 40px;
+    border-radius: 15rem;
+    box-shadow: inset 0 2px #585858, 1px 1px #000, 2px 2px 5px #000;
+}
+
+#base {
+    background-color: #151515;
+    width: 26rem;
+    height: 26rem;
+    margin-left: auto;
+    margin-right: auto;
+    top: 2rem;
+    position: relative;
+    border-radius: 13rem;
+    box-shadow: 1px 1px #5d5d5d;
+}
+
+
+
 #buzzerButton {
-    width: 80vw; /* 80% de la largeur de l'écran */
-    max-width: 300px; /* Limitation en pixels */
+    width: 25rem;
+    height: 25rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: auto;
+    cursor: pointer;
+    top: -0.5rem;
+    position: relative;
+    background-image: linear-gradient(to top, #ff2d55 0%, red 57%);
+    border-radius: 15rem;
+    box-shadow: inset 0 2px #a8a8a8, 0 2px #2a2a2a, 0 3px #2a2a2a, 0 4px #2a2a2a, 0 5px #2a2a2a, 0 6px #2a2a2a, 0 7px #2a2a2a, 0 8px #2a2a2a,
+        0 9px #2a2a2a, 0 10px #2a2a2a, 10px 20px 10px #000;
+    transition: all 0.2s;
+}
+
+#buzzerButton:active {
+    top: 0.5rem;
+    box-shadow: inset 0 2px #a8a8a8;
+}
+
+#buzzerButton[data-disabled="true"] {
+    transition: none;
+    pointer-events: none;
+    background-image: linear-gradient(to top, #a0a0a0 0%, gray 57%);
+}
+
+#buzzerButton.first {
+    background-image: linear-gradient(to top, rgb(255, 222, 35) 0%, gold 57%);
+}
+
+
+/* #buzzerButton {
+    width: 80vw;
+    max-width: 300px;
     height: 80vw;
     max-height: 300px;
-    border-radius: 50%; /* Rond parfait */
-    background-color: #e60000; /* Rouge actif */
+    border-radius: 50%;
+    background-color: #e60000;
     border: none;
     position: relative;
     display: inline-block;
     overflow: hidden;
-    text-indent: -9999px; /* Cache le texte */
+    text-indent: -9999px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     transition: box-shadow 0.1s ease;
 }
 
-#buzzerButton:disabled {
-    background-color: #aaa; /* Gris inactif */
-    pointer-events: none;
-    box-shadow: none; /* Pas d'ombre sur inactif */
-}
-
 #buzzerButton:active {
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Effet enfoncé */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
-#buzzerButton.first {
-    background-color: gold;
-}
+ */
 
 .toast {
     max-width: 9999px !important;
@@ -43,12 +97,26 @@
     height: 100svh;
 }
 
+#player #fullPageContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100vw;
+}
+
+#player #logo {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
 #player #countdownContainer {
     height: 20svh;
     font-family: monospace;
     display: flex;
     justify-content: center;
-    align-items:last baseline;
+    align-items: last baseline;
     padding: 15px;
 }
 
@@ -86,7 +154,6 @@
     color: #ffc107; /* Bootstrap yellow/warning */
 }
 
-
 #player #scoreContainer {
     height: 20svh;
     padding: 1rem; /* Responsive padding ; Bootstrap p-3 */
@@ -98,7 +165,7 @@
     font-weight: bold !important;
     display: flex;
     justify-content: center;
-    align-items:last baseline;
+    align-items: last baseline;
 }
 
 #player #scoreContainer .teamName {
@@ -118,6 +185,10 @@
 
 #player #scoreContainer #teamB .teamScore {
     order: 0;
+}
+
+#player #pseudoInput {
+    width: 300px;
 }
 
 /* Real view */
