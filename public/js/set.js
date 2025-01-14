@@ -10,6 +10,36 @@ import { buildCategoryBoard } from "./components/category.js"
 
 const page = document.querySelector(".mainContainer")
 
+// Déclaration des sons
+const audioBuzz = new Audio("../sound/hit_01.mp3")
+const audioBed = new Audio("../sound/affrontement_45v2.mp3") // affrontement_v2 : suspense pour choix
+const audioGenerique = new Audio("../sound/generique_karma.m4a")
+const audioSuspense = new Audio("../sound/suspense.mp3")
+const audioFinale = new Audio("../sound/finale_full.mp3") // ex finale_long.mp3
+const audioSting = new Audio("../sound/sting.mp3")
+const audioStingFinale = new Audio("../sound/pre_finale.m4a")
+const audioFinaleWin = new Audio("../sound/finale_win.mp3")
+const audioFinaleLose = new Audio("../sound/finale_lose.mp3")
+const audioRight = new Audio("../sound/correct_alt.mp4")
+const audioWrong = new Audio("../sound/wrong.m4a")
+
+audioBed.volume = 0.4
+audioFinale.volume = 0.4
+
+const sounds = {
+    buzz: audioBuzz,
+    affrontement: audioBed,
+    generique: audioGenerique,
+    suspense: audioSuspense,
+    finale: audioFinale,
+    sting: audioSting,
+    stingFinale: audioStingFinale,
+    finaleWin: audioFinaleWin,
+    finaleLose: audioFinaleLose,
+    right: audioRight,
+    wrong: audioWrong,
+}
+
 const categoryMap = {
     // doit être identique à categoryMap.js
     sav: "Savoirs académiques",
@@ -93,6 +123,8 @@ socket.on("updateElementStates", (elementStates) => {
 
         if (elementStates.round == 3 || elementStates.round == 12) {
             // finale ou affichage des questions en manche 1
+            // playOrPause(audioFinale)
+            // audioFinale.play()
             const fullPage = new ElementBuilder("div")
                 .setId("fullPageContainer") //
                 .addChild(buildQuestionContainer())
@@ -135,9 +167,7 @@ socket.on("display_empty", () => {
     buildLogo()
 })
 
-socket.on("playSound", ({ track }) => {
-    playOrPause(track)
-})
+//
 
 // buzzers, pour ne pas recharger toute la page
 
@@ -172,3 +202,79 @@ function showQuestion(question) {
 
 // buildPseudoInput()
 // buildOpenQuestionContainer()
+
+// SONS ##########
+
+socket.on("playSound", ({ trackName }) => {
+    playSound(trackName)
+})
+
+socket.on("pauseSound", ({ trackName }) => {
+    pauseSound(trackName)
+})
+
+socket.on("resumeSound", ({ trackName }) => {
+    resumeSound(trackName)
+})
+
+const playSound = (soundName) => {
+    const sound = sounds[soundName]
+    if (!sound) {
+        console.error(`Sound "${soundName}" not found`)
+        return
+    }
+
+    // Si le son est déjà en cours de lecture, le redémarrer
+    if (!sound.paused) {
+        sound.pause()
+        sound.currentTime = 0
+    }
+
+    // Jouer le son
+    sound.play().catch((error) => console.error(`Error playing sound "${soundName}":`, error))
+}
+
+const pauseSound = (soundName) => {
+    const sound = sounds[soundName]
+    if (!sound) {
+        console.error(`Sound "${soundName}" not found`)
+        return
+    }
+
+    if (!sound.paused) {
+        // Mettre en pause seulement si le son est en cours de lecture
+        sound.pause()
+    }
+}
+
+const resumeSound = (soundName) => {
+    const sound = sounds[soundName]
+    if (!sound) {
+        console.error(`Sound "${soundName}" not found`)
+        return
+    }
+
+    // Vérifie si le son est en pause avant de le redémarrer
+    if (sound.paused) {
+        sound.play().catch((error) => console.error(`Error resuming sound "${soundName}":`, error))
+    } else {
+        console.log(`Sound "${soundName}" is already playing.`)
+    }
+}
+
+const playOrPause = (soundName) => {
+    const sound = sounds[soundName]
+    if (!sound) {
+        console.error(`Sound "${soundName}" not found`)
+        return
+    }
+
+    if (sound.paused) {
+        // Jouer le son si il est en pause
+        sound.play().catch((error) => console.error(`Error playing sound "${soundName}":`, error))
+    } else {
+        // Mettre le son en pause et le réinitialiser si il est en cours de lecture
+        sound.pause()
+        sound.currentTime = 0
+    }
+}

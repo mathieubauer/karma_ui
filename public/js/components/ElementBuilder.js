@@ -38,6 +38,11 @@ class ElementBuilder {
         return this
     }
 
+    setHTML(html) {
+        this.element.innerHTML = html
+        return this
+    }
+
     addChild(child) {
         this.element.appendChild(child)
         return this

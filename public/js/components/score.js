@@ -11,16 +11,16 @@ function buildScoreBoard() {
     for (let i = 0; i < names.length; i++) {
         const teamDiv = new ElementBuilder("div") //
             .setId(`team${names[i]}`)
-            .addClass("teamArea")
+            .addClass("teamArea mx-3 d-flex")
             .build()
 
         const nameDiv = new ElementBuilder("div") //
-            .addClass("teamName")
-            .setText(`Équipe ${names[i]}`)
+            .addClass("teamName text-secondary")
+            .setText(`${names[i]}`)
             .build()
 
         const scoreDiv = new ElementBuilder("div") //
-            .addClass("teamScore")
+            .addClass("teamScore fw-bold ms-1")
             .build()
 
         teamDiv.appendChild(nameDiv)

@@ -1,17 +1,9 @@
-const categoryMap = {
-    pop: 'Pop culture, loisirs et sports',
-    vie: 'Vie quotidienne',
-    mon: 'Connaissance du monde',
-    aca: 'Savoirs académiques',
-    fin: 'Finale',
-    eli: 'Éliminatoire',
-}
+const categoryMap = require("./public/js/components/categoryMap.js")
 
 const questionSelector = (questions, category = null, count = 5) => {
-
     if (category) {
-        const longCategory = categoryMap[ category ]
-        questions = questions.filter(question => question.category == longCategory)
+        const longCategory = categoryMap[category]
+        questions = questions.filter((question) => question.category == longCategory)
     }
 
     let selectedQuestions = []
@@ -20,20 +12,18 @@ const questionSelector = (questions, category = null, count = 5) => {
     while (selectedQuestions.length < count && seenIndexes.size < questions.length) {
         const randomIndex = Math.floor(Math.random() * questions.length)
         if (!seenIndexes.has(randomIndex)) {
-            selectedQuestions.push(questions[ randomIndex ])
+            selectedQuestions.push(questions[randomIndex])
             seenIndexes.add(randomIndex)
         }
     }
 
     return selectedQuestions
-
 }
 
-const questionSelectorGame = (questions, category, firstQuestion) => {
-
-    if (category) {
-        const longCategory = categoryMap[ category ]
-        questions = questions.filter(question => question.category == longCategory)
+const questionSelectorGame = (questions, categoryCode, firstQuestion) => {
+    if (categoryCode) {
+        const longCategory = categoryMap[categoryCode]
+        questions = questions.filter((question) => question.category == longCategory)
     }
 
     let selectedQuestions = []
@@ -41,14 +31,19 @@ const questionSelectorGame = (questions, category, firstQuestion) => {
         selectedQuestions.push(questions[index])
     }
 
-    console.log(selectedQuestions.length);
-    console.log(selectedQuestions);
-
     return selectedQuestions
+}
 
+const questionSelectorCategory = (questions, categoryCode) => {
+    if (categoryCode) {
+        const longCategory = categoryMap[categoryCode]
+        questions = questions.filter((question) => question.category == longCategory)
+    }
+    return questions
 }
 
 module.exports = {
     questionSelector,
-    questionSelectorGame
+    questionSelectorGame,
+    questionSelectorCategory,
 }

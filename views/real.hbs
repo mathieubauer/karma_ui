@@ -1,227 +1,288 @@
 <div id="real" class="mainContainer container-fluid p-4">
 
-    {{! ACCUEIL ########## }}
-
-    <div class="row">
-
-        <div class="col-md-2 text-start">
-            <h1 class="fs-4">Accueil</h1>
-            <button type="button" id="display_empty" class="roundButton btn p-2 text-uppercase fw-bold">Empty</button>
-            <div class="form-check form-switch mt-3">
-                <input class="form-check-input" type="checkbox" role="switch" id="togglePseudo" />
-                <label class="form-check-label" for="togglePseudo">Pseudo</label>
-            </div>
-        </div>
-
-        <div class="col-md-5 text-start">
-
-            <div id="players" class>
-                <h2 class="fs-5">Connected Players</h2>
-                <div id="playersList"></div>
-            </div>
-
-            {{! TODO: double ID }}
-
-            {{! <div id="players" class="col-3 border p-2">
-                <h2 class="fs-4">Player Answers</h2>
-                <div id="answersList"></div>
-            </div> }}
-
-        </div>
-
-        <div class="col-md-5">
-
-            <form id="questionFileForm">
-                <div class="mb-3">
-                    <label for="questionFileSelect" class="form-label">Sélectionnez un fichier de questions</label>
-                    <select class="form-select" id="questionFileSelect" required>
-                        <option value="" disabled selected>Choisissez un fichier</option>
-                        <option value="karma_game_007.csv">Karma Game 007</option>
-                        <option value="karma_game_008.csv">Karma Game 008</option>
-                        <option value="karma_game_009.csv">Karma Game 009</option>
-                        <option value="karma_game_010.csv">Karma Game 010</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-secondary">Charger les Questions</button>
-            </form>
-
-        </div>
-
-    </div>
-
-    <hr />
-
-    {{! ROUND 1 ########## }}
-
-    <div class="row">
-
-        <div class="col-md-2 text-start">
-            <h1 class="fs-4">Manche 1</h1>
-            <button type="button" id="display_round1" class="roundButton btn p-2 text-uppercase fw-bold mb-2">Manche 1</button>
-        </div>
-
-        <div class="col-md-10 text-start">
-
-            <div class="d-flex align-items-center mb-2">
-                <button type="button" id="activateBuzzerBtn" class="btn btn-secondary p-2 text-uppercase fw-bold">
-                    Activer les buzzers
-                </button>
-                <div id="buzzResultsContainer" class="ms-4"></div>
-            </div>
-
-            <button type="button" id="requestQuestion" class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
-                Question au hasard
+    <!-- Onglets -->
+    <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="accueil-tab" data-bs-toggle="tab" data-bs-target="#accueil" type="button" role="tab">
+                Accueil
             </button>
-
-            <table border="1" id="tableau" class="table mb-2" style="height: 100px;">
-                <tr>
-                    <td id="questionRand"></td>
-                    <td id="answerRand" class="fw-bold"></td>
-                </tr>
-            </table>
-            <button type="button" id="sendQuestion" class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
-                Envoyer la question
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="manche1-tab" data-bs-toggle="tab" data-bs-target="#manche1" type="button" role="tab">
+                Manche 1
             </button>
-        </div>
-
-    </div>
-
-    <hr />
-
-    {{! ROUND 2 ########## }}
-
-    <div class="row">
-        <div class="col-md-2 text-start">
-            <h1 class="fs-4">Manche 2</h1>
-            <button type="button" id="display_round2" class="roundButton btn mb-2 p-2 text-uppercase fw-bold">Manche 2</button>
-            <br />
-            <button type="button" id="playSuspense" class="btn btn-secondary btn-sm mb-2 p-2 text-uppercase fw-bold">Suspense (C)</button>
-            <button type="button" id="playGameBed" class="btn btn-outline-secondary btn-sm mb-2 p-2 text-uppercase fw-bold">Affrontement
-                (Space)</button>
-        </div>
-        <div class="col-md-10 text-start">
-            <button type="button" id="pop" class="btn btn-secondary category me-2 my-1 p-2 text-uppercase fw-bold">
-                Pop culture, loisirs et sports
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="manche2choix-tab" data-bs-toggle="tab" data-bs-target="#manche2choix" type="button" role="tab">
+                Manche 2 - Choix
             </button>
-            <button type="button" id="vie" class="btn btn-secondary category me-2 my-1 p-2 text-uppercase fw-bold">
-                Vie quotidienne
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="manche2aff-tab" data-bs-toggle="tab" data-bs-target="#manche2aff" type="button" role="tab">
+                Manche 2 - Affrontements
             </button>
-            <button type="button" id="mon" class="btn btn-secondary category me-2 my-1 p-2 text-uppercase fw-bold">
-                Connaissance du monde
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="manche2elim-tab" data-bs-toggle="tab" data-bs-target="#manche2elim" type="button" role="tab">
+                Manche 2 - Éliminations
             </button>
-            <button type="button" id="aca" class="btn btn-secondary category me-2 my-1 p-2 text-uppercase fw-bold">
-                Savoirs académiques
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="finale-tab" data-bs-toggle="tab" data-bs-target="#finale" type="button" role="tab">
+                Finale
             </button>
+        </li>
+    </ul>
 
-            <hr />
+    <!-- Contenu des onglets -->
+    <div class="tab-content" id="dashboardTabsContent">
+
+        {{! ACCUEIL ########## }}
+
+        <div class="tab-pane fade show active p-3" id="accueil" role="tabpanel" aria-labelledby="home-tab">
 
             <div class="row">
-                <div class="col-6">
-                    <button type="button" id="startA" class="btn btn-primary start me-2 mb-2 p-2 text-uppercase fw-bold">Start A</button>
-                    <button type="button" id="startB" class="btn btn-primary start me-2 mb-2 p-2 text-uppercase fw-bold">Start B</button>
 
-                    <button type="button" id="draw" class="btn btn-secondary me-2 mb-2 p-2 text-uppercase fw-bold">Si égalité</button>
-                    {{! <button type="button" id="pause"
-                        class="btn btn-primary me-2 mb-2 p-2 text-uppercase fw-bold">Pause</button>
-                    }}
-                    <button type="button" id="resetTime" class="btn btn-outline-danger me-2 mb-2 p-2 text-uppercase fw-bold">Reset time</button>
-
-                    <div id="realCountdown"></div>
-                </div>
-                <div class="col-6">
-                    <div id="realScoreboard"></div>
-                </div>
-            </div>
-
-            <hr />
-
-            <div id="question-container" class="d-flex bg-white text-dark mb-3">
-                <div id="question" class="col-md-8 p-3" style="height: 100px;"></div>
-                <div id="answer" class="col-md-4 p-3 fw-bold text-end" style="height: 100px;"></div>
-            </div>
-
-            <button type="button" id="right" class="btn btn-success decision me-2 mb-2 p-2 text-uppercase fw-bold">Correct</button>
-            <button type="button" id="wrong" class="btn btn-danger decision me-2 mb-2 p-2 text-uppercase fw-bold">Incorrect</button>
-            <button type="button" id="steal" class="btn btn-warning decision me-2 mb-2 p-2 text-uppercase fw-bold">Vol</button>
-            <button type="button" id="resetScore" class="btn btn-outline-danger me-2 mb-2 p-2 text-uppercase fw-bold">Reset score</button>
-
-            <div>
-                {{#each questionsElim}}
-                    <div class="my-2">
-                        <span>{{question}}</span>
-                        <br />
-                        <span class="fw-bold">{{answer}}</span>
+                <div class="col-md-2 text-start">
+                    {{!-- <h1 class="fs-4">Accueil</h1> --}}
+                    <button type="button" id="display_empty" class="roundButton btn p-2 text-uppercase fw-bold">Logo</button>
+                    <div class="form-check form-switch mt-3">
+                        <input class="form-check-input" type="checkbox" role="switch" id="togglePseudo" />
+                        <label class="form-check-label" for="togglePseudo">Pseudo</label>
                     </div>
-                {{/each}}
-            </div>
+                    <button type="button" id="playGenerique" class="btn btn-secondary btn-sm m-2 p-2 text-uppercase fw-bold">Générique (G)</button>
+                    <button type="button" id="playSting" class="btn btn-secondary btn-sm m-2 p-2 text-uppercase fw-bold">Sting (H)</button>
+                </div>
 
-        </div>
-    </div>
-
-    <hr class="border border-primary border-3 opacity-75" />
-
-    {{! ########## }}
-    {{! ########## }}
-    {{! ########## }}
-
-    <div class="form-check form-switch mb-2">
-        <input class="form-check-input" type="checkbox" id="toggleQuestionContainer" />
-        <label class="form-check-label" for="toggleQuestionContainer">Question Container</label>
-    </div>
-    <div class="form-check form-switch mb-2">
-        <input class="form-check-input" type="checkbox" id="toggleAnswerInput" />
-        <label class="form-check-label" for="toggleAnswerInput">Answer Input</label>
-    </div>
-    <div class="form-check form-switch mb-2">
-        <input class="form-check-input" type="checkbox" id="toggleCountdown" />
-        <label class="form-check-label" for="toggleCountdown">Countdown</label>
-    </div>
-    <div class="form-check form-switch mb-2">
-        <input class="form-check-input" type="checkbox" id="toggleScore" />
-        <label class="form-check-label" for="toggleScore">Score</label>
-    </div>
-
-    <hr />
-    <hr />
-    <hr />
-
-    <button type="button" id="playGenerique" class="btn btn-secondary btn-sm m-2 p-2 text-uppercase fw-bold">Générique (G)</button>
-    <button type="button" id="playSting" class="btn btn-secondary btn-sm m-2 p-2 text-uppercase fw-bold">Sting (H)</button>
-
-    <br />
-
-    {{! <p class="small">
-        BUZZ : QWERTYUIOPA - CORRECT : Z - INCORRECT : X - TIMEOUT : L
-    </p> }}
-
-    <hr />
-
-    <div class="row">
-        <div class="col-md-2 text-start">
-            <h1 class="fs-4">Finale</h1>
-        </div>
-        <div class="col-md-10 text-start">
-            <button type="button" id="playStingFinale" class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">Sting finale
-                (J)</button>
-            <button type="button" id="playFinale" class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">Bed Finale (K)</button>
-            <button type="button" id="playFinaleWin" class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">Finale Win (B)</button>
-            <button type="button" id="playFinaleLose" class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">Finale Lose (N)</button>
-
-            <div>
-                {{#each questionsFinale}}
-                    <div class="my-2">
-                        <span>{{question}}</span>
-                        <br />
-                        <span class="fw-bold">{{answer}}</span>
+                <div class="col-md-5 text-start">
+                    <div id="players">
+                        <h2 class="fs-5">Connected Players</h2>
+                        <div id="playersList"></div>
                     </div>
-                {{/each}}
+                </div>
+
+                <div class="col-md-5">
+                    <div id="questionListName" class="fw-bold"></div>
+                    <form id="questionFileForm">
+                        <div class="mb-3">
+                            <label for="questionFileSelect" class="form-label">Sélectionnez un fichier de questions</label>
+                            <select class="form-select" id="questionFileSelect" required>
+                                <option value disabled selected>Choisissez un fichier</option>
+                                <option value="karma_game_007.csv">Karma Game 007</option>
+                                <option value="karma_game_008.csv">Karma Game 008</option>
+                                <option value="karma_game_009.csv">Karma Game 009</option>
+                                <option value="karma_game_010.csv">Karma Game 010</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Charger les Questions</button>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
+        {{! ROUND 1 ########## }}
+
+        <div class="tab-pane fade p-3" id="manche1" role="tabpanel" aria-labelledby="profile-tab">
+
+            <div class="row">
+
+                <div class="col-md-2 text-start">
+                    {{!-- <h1 class="fs-4">Manche 1</h1> --}}
+                    <button type="button" id="display_round1" class="roundButton btn p-2 text-uppercase fw-bold mb-2">Buzzers</button>
+                    <button type="button" id="display_round1_questions" class="roundButton btn p-2 text-uppercase fw-bold mb-2">Questions</button>
+                </div>
+
+                <div class="col-md-10 text-start">
+
+                    <div class="d-flex align-items-center mb-2">
+                        <button type="button" id="activateBuzzerBtn" class="btn btn-secondary p-2 text-uppercase fw-bold">
+                            Activer les buzzers
+                        </button>
+                        <div id="buzzResultsContainer" class="ms-4"></div>
+                    </div>
+
+                    <button type="button" id="requestQuestion" class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
+                        Question au hasard
+                    </button>
+
+                    <table border="1" id="tableau" class="table mb-2" style="height: 100px;">
+                        <tr>
+                            <td id="questionRand"></td>
+                            <td id="answerRand" class="fw-bold"></td>
+                        </tr>
+                    </table>
+
+                    <button type="button" id="sendQuestion" class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
+                        Envoyer la question
+                    </button>
+
+                    <div id="allQuestionsContainerRound1"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {{! ROUND 2 - Choix ########## }}
+
+        <div class="tab-pane fade p-3" id="manche2choix" role="tabpanel" aria-labelledby="settings-tab">
+
+            <div class="row">
+
+                <div class="col-md-2 text-start">
+                    <button type="button" id="display_round2_choices" class="roundButton btn mb-2 p-2 text-uppercase fw-bold">
+                        Thèmes
+                    </button>
+                </div>
+
+                <div class="col-md-10 text-start">
+                    <div id="categoryButtonsToDisplay"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+        {{! ROUND 2 - Affrontements ########## }}
+
+        <div class="tab-pane fade p-3" id="manche2aff" role="tabpanel" aria-labelledby="settings-tab">
+
+            <div class="row">
+
+                <div class="col-md-2 text-start">
+                    {{!-- <h1 class="fs-4">Manche 2</h1> --}}
+                    <button type="button" id="display_round2" class="roundButton btn mb-2 p-2 text-uppercase fw-bold">Manche 2</button>
+                    <br />
+                    <button type="button" id="playGameBed" class="btn btn-outline-secondary btn-sm mb-2 p-2 text-uppercase fw-bold">Affrontement (Space)</button>
+                </div>
+
+                <div class="col-md-10 text-start">
+                    <div id="categoryButtons"></div>
+
+                    <hr />
+
+                    <div class="row">
+
+                        <div class="col-6">
+                            <button type="button" id="startA" class="btn btn-primary start me-2 mb-2 p-2 text-uppercase fw-bold">
+                                Start A
+                            </button>
+                            <button type="button" id="startB" class="btn btn-primary start me-2 mb-2 p-2 text-uppercase fw-bold">
+                                Start B
+                            </button>
+                            <button type="button" id="draw" class="btn btn-secondary me-2 mb-2 p-2 text-uppercase fw-bold">
+                                Si égalité
+                            </button>
+                            <button type="button" id="resetTime" class="btn btn-outline-danger me-2 mb-2 p-2 text-uppercase fw-bold">
+                                Reset time
+                            </button>
+                            <div id="realCountdown"></div>
+                        </div>
+
+                        <div class="col-6">
+                            <div id="realScoreboard"></div>
+                        </div>
+
+                    </div>
+
+                    <hr />
+
+                    <div id="question-container" class="d-flex bg-white text-dark mb-3">
+                        <div id="question" class="col-md-8 p-3" style="height: 100px;"></div>
+                        <div id="answer" class="col-md-4 p-3 fw-bold text-end" style="height: 100px;"></div>
+                    </div>
+
+                    <button type="button" id="right" class="btn btn-success decision me-2 mb-2 p-2 text-uppercase fw-bold">Correct</button>
+                    <button type="button" id="wrong" class="btn btn-danger decision me-2 mb-2 p-2 text-uppercase fw-bold">Incorrect</button>
+                    <button type="button" id="steal" class="btn btn-warning decision me-2 mb-2 p-2 text-uppercase fw-bold">Vol</button>
+                    <button type="button" id="resetScore" class="btn btn-outline-danger me-2 mb-2 p-2 text-uppercase fw-bold">Reset score</button>
+
+                    <div id="allQuestionsContainer" class></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {{! ROUND 2 - Éliminations ########## }}
+
+        <div class="tab-pane fade p-3" id="manche2elim" role="tabpanel" aria-labelledby="settings-tab">
+
+            <div class="row">
+
+                <div class="col-md-2 text-start">
+                    {{!-- <h1 class="fs-4">Manche 2 - Éliminations</h1> --}}
+                    <button type="button" id="playSuspense" class="btn btn-secondary btn-sm mb-2 p-2 text-uppercase fw-bold">Suspense (C)</button>
+                </div>
+
+                <div class="col-md-10 text-start">
+
+                    <div>
+                        {{#each questionsElim}}
+                            <div class="my-2">
+                                <span>{{question}}</span>
+                                <br />
+                                <span class="fw-bold">{{answer}}</span>
+                            </div>
+                        {{/each}}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {{! FINALE ########## }}
+        <div class="tab-pane fade p-3" id="finale" role="tabpanel" aria-labelledby="profile-tab">
+
+            <div class="row">
+
+                <div class="col-md-2 text-start">
+                    <h1 class="fs-4">Finale</h1>
+                </div>
+
+                <div class="col-md-10 text-start">
+
+                    <button type="button" id="playStingFinale" class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">
+                        Sting finale (J)
+                    </button>
+                    <button type="button" id="playFinale" class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">
+                        Bed Finale (K)
+                    </button>
+                    <button type="button" id="playFinaleWin" class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">
+                        Finale Win (B)
+                    </button>
+                    <button type="button" id="playFinaleLose" class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">
+                        Finale Lose (N)
+                    </button>
+
+                    <div id="questionsFinale">
+                        {{#each questionsFinale}}
+                            <div class="my-2">
+                                <span>{{question}}</span>
+                                <br />
+                                <span class="fw-bold">{{answer}}</span>
+                            </div>
+                        {{/each}}
+                    </div>
+
+                </div>
+
             </div>
 
         </div>
 
     </div>
-
 </div>
+
+{{! <p class="small">
+            BUZZ : QWERTYUIOPA - CORRECT : Z - INCORRECT : X - TIMEOUT : L
+        </p> }}
 
 <!-- TODO: Modal pour les règles
 

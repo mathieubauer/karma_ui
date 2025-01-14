@@ -6,9 +6,15 @@ let countdownInterval
 function buildCountdown(time) {
     const { minutes, seconds, centiseconds } = formatTime(time)
 
-    const secondsSpan = new ElementBuilder("span").addClass("seconds").setText(`${minutes}:${seconds}`).build()
+    const secondsSpan = new ElementBuilder("span") //
+        .addClass("seconds")
+        .setText(`${minutes}:${seconds}`)
+        .build()
 
-    const centisecondsSpan = new ElementBuilder("span").addClass("centiseconds").setText(`.${centiseconds}`).build()
+    const centisecondsSpan = new ElementBuilder("span") //
+        .addClass("centiseconds")
+        .setText(`.${centiseconds}`)
+        .build()
 
     const countdownContainer = new ElementBuilder("div")
         .setId("countdownContainer")

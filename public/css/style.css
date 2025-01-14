@@ -90,7 +90,10 @@
     font-size: clamp(24px, 5vw, 40px);
 }
 
+
+/* ########## */
 /* Player view */
+/* ########## */
 
 #player {
     background-image: url("/img/bg.png");
@@ -112,7 +115,7 @@
 }
 
 #player #countdownContainer {
-    height: 20svh;
+    height: 30svh;
     font-family: monospace;
     display: flex;
     justify-content: center;
@@ -129,7 +132,8 @@
 }
 
 #player #questionContainer {
-    height: 60svh;
+    width: 100%;
+    height: 50svh;
     padding: 0 3rem; /* Responsive padding ; Bootstrap px-5 */
 }
 

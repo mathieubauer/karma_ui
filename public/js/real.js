@@ -2,6 +2,7 @@ import socket from "./components/socket.js"
 import { buildScoreBoard, updateScores } from "./components/score.js"
 import { buildCountdown, startCountdown, pauseCountdown } from "./components/countdown.js"
 import { showToast } from "./components/toast.js"
+import ElementBuilder from "./components/ElementBuilder.js"
 
 // Déclaration des sons
 const audioBuzz = new Audio("../sound/hit_01.mp3")
@@ -27,14 +28,82 @@ let state = "IDLE"
 socket.emit("getElementStates") // onload
 
 socket.on("updateElementStates", (elementStates) => {
+    // Éléments dynamiques
+    const questionsFinale = document.querySelector("#questionsFinale")
+    questionsFinale.innerHTML = ""
+
     if (elementStates.round || elementStates.round == 0) {
+        // TODO, vérifier ça
         if (elementStates.round == 0) displayRoundButtons("display_empty")
-        if (elementStates.round == 1) displayRoundButtons("display_round1")
+        if (elementStates.round == 11) displayRoundButtons("display_round1") // Round1 avec buzzers
+        if (elementStates.round == 12) displayRoundButtons("display_round1_questions") // Round1 avec questions
         if (elementStates.round == 2) displayRoundButtons("display_round2")
+        if (elementStates.round == 21) displayRoundButtons("display_round2_choices")
     }
 
-    if (elementStates.currentCategory) {
+    if (elementStates.questionListName) {
+        document.querySelector("#questionListName").textContent = elementStates.questionListName
+    }
+
+    if (elementStates.questionListCategories) {
+        const categoryButtonsContainer = document.querySelector("#categoryButtons")
+        categoryButtonsContainer.innerHTML = ""
+
+        const categoryButtonsDisplayContainer = document.querySelector("#categoryButtonsToDisplay")
+        categoryButtonsDisplayContainer.innerHTML = ""
+
+        elementStates.questionListCategories.forEach((category) => {
+            const button = new ElementBuilder("button")
+                .setId(category.code) // Prend les trois premiers char
+                .addClass("btn btn-secondary btn-sm category me-2 my-1 p-2 text-uppercase fw-bold")
+                .setAttribute("type", "button")
+                .setText(`${category.name}`)
+                .addEvent("click", () => {
+                    socket.emit("category", { newCategory: category.code })
+                })
+                .build()
+            categoryButtonsContainer.appendChild(button)
+
+            const buttonDisplay = new ElementBuilder("button")
+                .addClass("displayCategoryButton btn  me-2 my-1 p-2 text-uppercase fw-bold")
+                .addClass(`${category.isAvailable ? "btn-warning" : "btn-outline-secondary"}`)
+                .setAttribute("type", "button")
+                .setAttribute("data-category", category.code) // trois premières lettres
+                .setText(`${category.name}`)
+                .addEvent("click", (event) => {
+                    socket.emit("displayCategory", { categoryToToggle: event.target.dataset.category })
+                    socket.emit("category", { newCategory: event.target.dataset.category })
+                })
+                .build()
+            categoryButtonsDisplayContainer.appendChild(buttonDisplay)
+        })
+    }
+
+    if (elementStates.currentCategory && elementStates.currentCategory != "man" && elementStates.currentCategory != "fin") {
+        // exception pour la manche 1 et pour la finale
         displayCategoryButtons(elementStates.currentCategory)
+    }
+
+    if (elementStates.selectedQuestions.length > 0) {
+        const container = document.querySelector("#allQuestionsContainer")
+        const containerR1 = document.querySelector("#allQuestionsContainerRound1")
+        container.innerHTML = ""
+        containerR1.innerHTML = ""
+        elementStates.selectedQuestions.forEach((question, index) => {
+            const div = new ElementBuilder("div") //
+                .addClass("question mb-1")
+                .setHTML(
+                    `<span class="text-secondary">${index + 1}</span> <span class="fw-bold">${question.question}</span> - ${
+                        question.answer
+                    }`,
+                )
+                .build()
+            if (elementStates.currentCategory == "man") {
+                containerR1.appendChild(div)
+            } else {
+                container.appendChild(div)
+            }
+        })
     }
 
     if (elementStates.isRunning !== undefined && elementStates.remainingTime !== undefined && elementStates.endTime !== undefined) {
@@ -60,34 +129,87 @@ socket.on("updateElementStates", (elementStates) => {
     document.querySelector("#answer").innerHTML = elementStates.currentQuestion ? elementStates.currentQuestion.answer : ""
 
     if (!elementStates.currentQuestion) {
-        // add attribute disabled
-
         document.querySelector("#right").disabled = true
         document.querySelector("#wrong").disabled = true
         document.querySelector("#steal").disabled = true
     } else {
         document.querySelector("#right").disabled = false
         document.querySelector("#wrong").disabled = false
-        document.querySelector("#steal").disabled = false
+        // document.querySelector("#steal").disabled = false
     }
 
     if (elementStates.activePlayer !== undefined) {
         document.getElementById("buzzResultsContainer").innerHTML = elementStates.activePlayer
     }
+
+    // FINALE
+
+    if (elementStates.round == 3) {
+        if (elementStates.selectedQuestions.length > 0) {
+            elementStates.selectedQuestions.forEach((question, index) => {
+                const orderText = new ElementBuilder("span").addClass("text-secondary").setText(`${question.order}`).build()
+                const questionText = new ElementBuilder("span").addClass("fw-bold").setText(`${question.question}`).build()
+                const answerText = new ElementBuilder("span").setText(` - ${question.answer}`).build()
+
+                const questionContainer = new ElementBuilder("div")
+                    .addClass("question mb-1")
+                    .addChild(orderText)
+                    .addChild(new ElementBuilder("span").setText(" ").build()) // espace entre index et question
+                    .addChild(questionText)
+                    .addChild(answerText)
+                    .addEvent("click", () => {
+                        socket.emit("sendQuestion", question)
+                    })
+                    .build()
+
+                questionsFinale.appendChild(questionContainer)
+            })
+        }
+    }
+})
+
+function round1() {
+    socket.emit("round", { newRound: 1 })
+    socket.emit("category", { newCategory: "man" })
+}
+
+function finale() {
+    socket.emit("round", { newRound: 3 })
+    socket.emit("category", { newCategory: "fin" })
+    // socket.emit("playSound", { trackName: "finale" })
+}
+
+document.querySelectorAll('#dashboardTabs button[data-bs-toggle="tab"]').forEach((tabButton) => {
+    tabButton.addEventListener("shown.bs.tab", (event) => {
+        if (event.target.id == "accueil-tab") socket.emit("round", { newRound: 0 })
+        if (event.target.id == "manche1-tab") round1()
+        if (event.target.id == "manche2choix-tab") socket.emit("round", { newRound: 21 })
+        if (event.target.id == "manche2aff-tab") socket.emit("round", { newRound: 2 })
+        if (event.target.id == "manche2elim-tab") socket.emit("round", { newRound: 0 })
+        if (event.target.id == "finale-tab") finale()
+    })
 })
 
 // Affichage de l'écran joueur #####
 
 document.getElementById("display_empty").addEventListener("click", () => {
-    socket.emit("display_empty")
+    socket.emit("round", { newRound: 0 })
 })
 
 document.getElementById("display_round1").addEventListener("click", () => {
-    socket.emit("display_round1")
+    socket.emit("round", { newRound: 11 }) // round 1 avec buzzers
+})
+
+document.getElementById("display_round1_questions").addEventListener("click", () => {
+    socket.emit("round", { newRound: 12 }) // round 1 avec buzzers
 })
 
 document.getElementById("display_round2").addEventListener("click", () => {
-    socket.emit("display_round2")
+    socket.emit("round", { newRound: 2 })
+})
+
+document.getElementById("display_round2_choices").addEventListener("click", () => {
+    socket.emit("round", { newRound: 21 })
 })
 
 // ##### ON REPREND TOUT
@@ -213,6 +335,8 @@ document.getElementById("resetTime").addEventListener("click", () => {
 
 document.querySelectorAll(".decision").forEach((button) => {
     button.addEventListener("click", (event) => {
+        if (button.disabled) return
+        setCooldown(button, 2000)
         const decision = event.target.id
         socket.emit("decision", { decision })
         if (decision == "wrong") audioWrong.play()
@@ -227,10 +351,14 @@ document.querySelector("#wrong").addEventListener("click", () => {
         audioBed.pause()
         isAffrontementPlaying = false
         document.querySelector("#right").classList.remove("btn-success")
+        document.querySelector("#steal").disabled = false
+        // document.querySelector("#steal").classList.add("btn-warning")
     } else {
         audioBed.play()
         isAffrontementPlaying = true
         document.querySelector("#right").classList.add("btn-success")
+        document.querySelector("#steal").disabled = true
+        // document.querySelector("#steal").classList.remove("btn-warning")
     }
 })
 
@@ -241,6 +369,7 @@ document.querySelector("#steal").addEventListener("click", () => {
         audioBed.play()
         isAffrontementPlaying = true
         document.querySelector("#right").classList.add("btn-success")
+        document.querySelector("#steal").disabled = true
     }
 })
 
@@ -253,13 +382,10 @@ document.getElementById("resetScore").addEventListener("click", () => {
 // Gestion des questionnaires
 
 document.getElementById("questionFileForm").addEventListener("submit", (e) => {
-    e.preventDefault() // Empêche le rechargement de la page
-
+    e.preventDefault()
     const select = document.getElementById("questionFileSelect")
     const selectedFile = select.value
-
     if (selectedFile) {
-        // Émet l'événement avec le nom du fichier sélectionné
         socket.emit("changeQuestionFile", { fileName: selectedFile })
         showToast(`Fichier de questions "${selectedFile}" chargé avec succès !`, "success")
     } else {
@@ -421,4 +547,14 @@ function displayCategoryButtons(activeCategory) {
         button.classList.add("btn-secondary")
     })
     document.querySelector(`#${activeCategory}`).classList.add("btn-warning")
+}
+
+function setCooldown(button, cooldownTime = 1000) {
+    button.disabled = true // Désactiver le bouton
+    button.classList.add("disabled") // Ajoute une classe (optionnel pour du style)
+
+    setTimeout(() => {
+        button.disabled = false // Réactiver le bouton
+        button.classList.remove("disabled") // Retire la classe (optionnel pour du style)
+    }, cooldownTime)
 }

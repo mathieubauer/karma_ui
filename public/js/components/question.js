@@ -3,10 +3,6 @@ import { showToast } from "./toast.js"
 import ElementBuilder from "./ElementBuilder.js"
 
 function buildQuestionContainer() {
-    const questionContainer = new ElementBuilder("div")
-        .setId("questionContainer") //
-        .build()
-
     const statementDiv = new ElementBuilder("div")
         .setId("question") //
         .build()
@@ -15,8 +11,11 @@ function buildQuestionContainer() {
         .setId("question-category") //
         .build()
 
-    questionContainer.appendChild(statementDiv)
-    questionContainer.appendChild(categoryDiv)
+    const questionContainer = new ElementBuilder("div")
+        .setId("questionContainer") //
+        .addChild(statementDiv)
+        .addChild(categoryDiv)
+        .build()
 
     return questionContainer
 }

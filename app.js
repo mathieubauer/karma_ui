@@ -3,7 +3,7 @@ const http = require("http")
 const express = require("express")
 const socketio = require("socket.io")
 const hbs = require("hbs")
-const { questionSelector, questionSelectorGame } = require("./questionSelector")
+const { questionSelector, questionSelectorGame, questionSelectorCategory } = require("./questionSelector")
 const loadQuestions = require("./loadQuestions")
 
 const app = express()
@@ -44,10 +44,13 @@ const elementStates = {
     buzzerActive: false,
     questionContainer: false,
     answerInput: false,
+    questionListName: "",
+    questionListCategories: [],
     countdown: false,
     score: false,
     currentCategory: "",
     currentQuestion: "",
+    selectedQuestions: [],
     activePlayer: null,
     remainingTime: duration,
     endTime: 0,
@@ -59,11 +62,21 @@ const elementStates = {
 /**
  * Met tout le fichier dans questions
  */
-loadQuestions("karma_game_010.csv")
+loadQuestions("karma_satisfaction.csv")
     // loadQuestions('karma_lpgqdf.csv')
     .then((loadedQuestions) => {
         questions = loadedQuestions
-        questionsLoaded = true
+        const excludedCategories = ["Qualification", "Manche 1", "Finale", "Éliminatoire"]
+        const categories = [...new Set(questions.map((item) => item.category))]
+            .filter((category) => !excludedCategories.includes(category))
+            .map((category) => ({
+                name: category,
+                code: category.slice(0, 3).toLowerCase(), // Code en minuscule avec des underscores
+                isAvailable: true, // Par défaut, on met toutes les catégories à true
+            }))
+        elementStates.questionListName = "karma_satisfaction.csv"
+        elementStates.questionListCategories = categories
+        io.emit("updateElementStates", elementStates)
         console.log(questions.length + " questions chargées")
     })
     .catch((error) => console.error("Erreur lors du chargement des questions:", error))
@@ -71,7 +84,6 @@ loadQuestions("karma_game_010.csv")
 loadQuestions("karma_lpgqdf.csv")
     .then((loadedQuestions) => {
         allQuestions = loadedQuestions
-        // questionsLoaded = true
         console.log(allQuestions.length + " questions chargées")
     })
     .catch((error) => console.error("Erreur lors du chargement des questions:", error))
@@ -110,24 +122,6 @@ io.on("connection", (socket) => {
         socket.emit("updateElementStates", elementStates)
     })
 
-    // socket.emit("updateElementStates", elementStates)
-
-    // if (!isRunning) {
-    //     endTime = Date.now() + remainingTime
-    // }
-    // endTime = Date.now() + remainingTime
-
-    // Seulement au client qui vient de se connecter
-    // socket.emit("updateElementStates", elementStates)
-
-    // if (elementStates.round == 1) socket.emit("display_round1")
-    // if (elementStates.round == 2) socket.emit("display_round2")
-
-    // À tous les clients
-    // io.emit("chronoUpdate", { endTime, isRunning })
-    // io.emit("questionUpdate", { question: selectedQuestions[questionIndex] }) // on reload
-    // io.emit("teamUpdate", { activeTeam })
-
     socket.on("start", ({ startTeam }) => {
         if (!elementStates.currentCategory) {
             socket.emit("displayError", {
@@ -145,8 +139,10 @@ io.on("connection", (socket) => {
         let firstQuestion = 0
         if (activeTeam == "B") firstQuestion = +5
         selectedQuestions = questionSelectorGame(questions, elementStates.currentCategory, firstQuestion)
+        // elementStates.selectedQuestions = selectedQuestions // on garde les 12
         elementStates.currentQuestion = selectedQuestions[questionIndex]
         io.emit("updateElementStates", elementStates)
+        io.emit("playSound", { trackName: "affrontement" })
         firstQuestion = 0
     })
 
@@ -185,13 +181,26 @@ io.on("connection", (socket) => {
 
     socket.on("category", ({ newCategory }) => {
         elementStates.currentCategory = newCategory
+        selectedQuestions = questionSelectorCategory(questions, newCategory)
+        elementStates.selectedQuestions = selectedQuestions
         io.emit("updateElementStates", elementStates)
+    })
+
+    socket.on("displayCategory", ({ categoryToToggle }) => {
+        const category = elementStates.questionListCategories.find((cat) => cat.code === categoryToToggle)
+        if (category) {
+            category.isAvailable = !category.isAvailable // Bascule true/false
+            io.emit("updateElementStates", elementStates)
+        }
     })
 
     socket.on("decision", ({ decision }) => {
         if (decision == "wrong" && elementStates.isRunning) {
+            io.emit("playSound", { trackName: "wrong" })
+            io.emit("pauseSound", { trackName: "affrontement" })
             pauseCount()
         } else if (decision == "wrong" && !elementStates.isRunning) {
+            io.emit("resumeSound", { trackName: "affrontement" })
             startCount()
             questionIndex++
         }
@@ -200,12 +209,15 @@ io.on("connection", (socket) => {
             if (decision == "right") {
                 if (activeTeam == "A") elementStates.scoreA += 1
                 if (activeTeam == "B") elementStates.scoreB += 1
+                io.emit("playSound", { trackName: "right" })
                 startCount()
                 questionIndex++
             }
             if (decision == "steal") {
                 if (activeTeam == "A") elementStates.scoreB += 2 // 2 points pour voler
                 if (activeTeam == "B") elementStates.scoreA += 2
+                io.emit("playSound", { trackName: "right" })
+                io.emit("resumeSound", { trackName: "affrontement" })
                 startCount()
                 questionIndex++
             }
@@ -236,18 +248,8 @@ io.on("connection", (socket) => {
 
     // Display rounds
 
-    socket.on("display_empty", () => {
-        elementStates.round = 0
-        io.emit("updateElementStates", elementStates)
-    })
-
-    socket.on("display_round1", () => {
-        elementStates.round = 1
-        io.emit("updateElementStates", elementStates)
-    })
-
-    socket.on("display_round2", () => {
-        elementStates.round = 2
+    socket.on("round", ({ newRound }) => {
+        elementStates.round = newRound
         io.emit("updateElementStates", elementStates)
     })
 
@@ -259,6 +261,7 @@ io.on("connection", (socket) => {
     // Gestion des questions #########
 
     socket.on("sendQuestion", (question) => {
+        console.log(question)
         elementStates.currentQuestion = question.question
         io.emit("updateElementStates", elementStates)
     })
@@ -316,13 +319,12 @@ io.on("connection", (socket) => {
         loadQuestions(fileName)
             .then((loadedQuestions) => {
                 questions = loadedQuestions
-                questionsLoaded = true
                 console.log(questions.length + " questions chargées")
-
                 activeTeam = null
                 io.emit("teamUpdate", { activeTeam })
                 questionIndex = 0
                 selectedQuestions = []
+                elementStates.questionListName = fileName
                 elementStates.currentQuestion = ""
                 elementStates.currentCategory = ""
                 elementStates.scoreA = 0
@@ -345,6 +347,12 @@ io.on("connection", (socket) => {
             io.emit("updateElementStates", elementStates)
         }, 5000)
     })
+
+    // sons
+
+    socket.on("playSound", ({ trackName }) => {
+        io.emit("playSound", { trackName })
+    })
 })
 
 app.get("/", (req, res) => {
@@ -359,6 +367,13 @@ app.get("/real", (req, res) => {
         questions,
         questionsElim: questionSelector(questions, "eli"),
         questionsFinale: questionSelector(questions, "fin"),
+        elementStates,
+    })
+})
+
+app.get("/set", (req, res) => {
+    res.render("set", {
+        layout: "layouts/main",
         elementStates,
     })
 })
@@ -380,25 +395,39 @@ server.listen(port, () => {
 })
 
 // TODO - Tout reprendre
+//
+// POUR TESTS JANVIER
+// [] Dissocier écran joueur (avec saisie) et écran plateau
+// [x] Envoi son sur autres écrans ?
+// [x] Éviter les doubles appuis sur la tablette
+// [] Vols après le chrono
+//      [] Il faut donner le dernière réponse avant le fin des 45 secondes. Si on n'a pas joué toutes les questions, les adversaires les jouent.
+// [x] Afficheur de thèmes
+// [] UI finale, avec les thèmes qui se retournent
+//      [] Finale : écran spécial + système de vote
+// [] Afficher règles
+// [] Sound design : fin de manche, victoire en finale, points volés (double gling)
+//      [] bed pour les affrontements, avec un son de fin
+// [] QR code pour url locale ?
+
+//
 // [x] Garder l'état de la manche actuelle côté serveur
 //      [x] Accueil : auth ou logo
 //      [x] Manche 1 : auth ou buzzers
-//              [] UI buzzers
-//      [] Manche 2 : écran spécial
-//              [] 5 thèmes
+//              [x] UI buzzers
+//      [x] Manche 2 : écran spécial
+//              [x] 5 thèmes
 //              [x] Loader de partie
-//              [] Afficher toutes les questions de la manche
+//              [x] Afficher toutes les questions de la manche
 //              [x] Pourquoi le chrono à 00:00 on refresh
 //              [x] Garder les points on refresh (actuellement, efface sur celui qui refresh et actualise les autres)
-//      [] Finale : écran spécial + système de vote
-// [] QR code pour url locale ?
-// [] Revoir les questions des parties ; reprendre des parties à 5 thèmes
+// [x] Revoir les questions des parties ; reprendre des parties à 5 thèmes
 // [] Système de mot de passe / kick ban des utilisateurs
 // [x] Héberger !!!
-// [] Faire une première manche avec 20 questions sélectionnées
-//      [] Les tester dans questions_v3 / quiz
-//      [] Base de donneés ? Mongoose ? Ou dans Questions ?
-// [] rendre beau côté /real
+// [x] Faire une première manche avec 20 questions sélectionnées
+//      [x] Les tester dans questions_v3 / quiz
+//      [x] Base de donneés ? Mongoose ? Ou dans Questions ?
+// [x] rendre beau côté /real
 // [] compter les points : système de réponses attendues tolérant + comptage de points manuel (ajouter / enlever)
 // [] beau chrono : https://css-tricks.com/how-to-create-an-animated-countdown-timer-with-html-css-and-javascript/
 
@@ -419,8 +448,6 @@ server.listen(port, () => {
 // [] néon ui : https://css-tricks.com/how-to-create-neon-text-with-css/
 // [] créer un préparateur de questionnaires (donner 15 questions à équilibrer en deux séries de 5 et une éliminatoire, permettre la modification)
 // [x] UI host, centré dans l'écran, couleurs KARMA
-// [] bed pour les affrontements, avec un son de fin
-// [] Il faut donner le dernière réponse avant le fin des 45 secondes. Si on n'a pas joué toutes les questions, les adversaires les jouent.
 
 // pour second device : http://192.168.X.X:3001/player (si connecté sur le même WiFi)
 
