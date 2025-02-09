@@ -7,6 +7,7 @@ import { buildPseudoInput } from "./components/pseudo.js"
 import { buildBuzzer } from "./components/buzzer.js"
 import ElementBuilder from "./components/ElementBuilder.js"
 import { buildCategoryBoard } from "./components/category.js"
+import { buildAnswerInputContainer } from "./components/answerInput.js"
 
 const page = document.querySelector(".mainContainer")
 
@@ -104,6 +105,22 @@ socket.on("updateElementStates", (elementStates) => {
             showQuestion(elementStates.currentQuestion)
             return
         }
+
+        if (elementStates.round == 13) {
+            // questions ouvertes à réponses écrites
+            const fullPage = new ElementBuilder("div")
+                .setId("fullPageContainer") //
+                .addClass("flex-column")
+                .addChild(buildQuestionContainer())
+                .addChild(buildAnswerInputContainer())
+                .build()
+            page.appendChild(fullPage)
+            if (elementStates.currentCategory) {
+                document.querySelector("#question-category").textContent = categoryMap[elementStates.currentCategory]
+            }
+            showQuestion(elementStates.currentQuestion)
+            return
+        }
     }
 
     Object.entries(elementStates).forEach(([elementId, value]) => {
@@ -117,14 +134,6 @@ socket.on("updateElementStates", (elementStates) => {
 })
 
 // #####
-
-socket.on("chronoUpdate", ({ isRunning, remainingTime, endTime }) => {
-    if (isRunning) {
-        startCountdown(endTime)
-    } else {
-        pauseCountdown(remainingTime)
-    }
-})
 
 socket.on("questionUpdate", ({ question }) => {
     showQuestion(question)
@@ -157,7 +166,7 @@ function showQuestion(question) {
             // Si c'est un objet avec une propriété 'question'
             questionElement.textContent = question.question
         } else if (typeof question === "string") {
-            // Si c'est une chaîne de caractères
+            // Si c'est une chaîne de caractères, y compris ""
             questionElement.textContent = question
         } else {
             // Cas où question est null, undefined, ou invalide

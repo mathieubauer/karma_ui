@@ -1,3 +1,13 @@
+/* FONT */
+
+@font-face {
+    font-family: 'Gotham';
+    src: url('/fonts/Gotham-Bold.otf') format('opentype'); /* Déclare le format comme OpenType */
+    font-weight: bold;
+    font-style: normal;
+}
+
+
 /* BUZZER UI */
 
 #buzzerMount {
@@ -96,8 +106,14 @@
 /* ########## */
 
 #player {
-    background-image: url("/img/bg.png");
+    /* background-image: url("/img/bg.png"); */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("/img/bg.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     height: 100svh;
+    font-family: 'Gotham', sans-serif;
+    font-weight: bold;
 }
 
 #player #fullPageContainer {
@@ -145,6 +161,11 @@
     border-radius: 2rem; /* Responsive border-radius ; Bootstrap rounded-5 */
     padding: 1rem; /* Responsive padding ; Bootstrap p-3 */
     padding: 1.5rem; /* Responsive padding ; Bootstrap p-4 */
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 #player #questionContainer #question-category {
@@ -195,9 +216,27 @@
     max-width: 400px;
 }
 
+/* ########## */
 /* Real view */
+/* ########## */
 
 #realCountdown {
     font-family: monospace;
     font-size: calc(1.3rem + 0.6vw) !important; /* Responsive font ; Bootstrap fs-3 */
+}
+
+/* ########## */
+/* Set view */
+/* ########## */
+
+#player.set #questionContainer #question {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+#player.set .displayCategory {
+    font-size: calc(1.3rem + 0.6vw) !important;     /* Responsive font ; Bootstrap fs-3 */
+    font-size: calc(1.275rem + .3vw)!important;     /* Responsive font ; Bootstrap fs-4 */
 }

@@ -35,6 +35,9 @@ let allQuestions = []
 let questions = []
 let selectedQuestions = []
 let questionIndex = 0
+let questionIndexTotal = 0
+
+let isSteal = false
 
 const connectedUsers = {}
 
@@ -57,16 +60,20 @@ const elementStates = {
     isRunning: false,
     scoreA: 0,
     scoreB: 0,
+    scoreFinale: ["", "", "", "", ""],
 }
+
+const maxGaps = [5, 4, 3, 2, 1] // Écarts maximaux pour chaque question
 
 /**
  * Met tout le fichier dans questions
  */
-loadQuestions("karma_satisfaction.csv")
+loadQuestions("karma_satisfaction_v2.csv")
+    // loadQuestions('karma_satisfaction_012.csv')
     // loadQuestions('karma_lpgqdf.csv')
     .then((loadedQuestions) => {
         questions = loadedQuestions
-        const excludedCategories = ["Qualification", "Manche 1", "Finale", "Éliminatoire"]
+        const excludedCategories = ["Qualification", "Manche 1", "Finale", "Éliminatoire", "Super Finale"]
         const categories = [...new Set(questions.map((item) => item.category))]
             .filter((category) => !excludedCategories.includes(category))
             .map((category) => ({
@@ -74,7 +81,7 @@ loadQuestions("karma_satisfaction.csv")
                 code: category.slice(0, 3).toLowerCase(), // Code en minuscule avec des underscores
                 isAvailable: true, // Par défaut, on met toutes les catégories à true
             }))
-        elementStates.questionListName = "karma_satisfaction.csv"
+        elementStates.questionListName = "karma_satisfaction_v2.csv"
         elementStates.questionListCategories = categories
         io.emit("updateElementStates", elementStates)
         console.log(questions.length + " questions chargées")
@@ -91,7 +98,8 @@ loadQuestions("karma_lpgqdf.csv")
 const pauseCount = () => {
     if (!elementStates.isRunning) return
     elementStates.isRunning = false
-    elementStates.remainingTime = elementStates.endTime - Date.now()
+    // elementStates.remainingTime = elementStates.endTime - Date.now()
+    elementStates.remainingTime = Math.max(0, elementStates.endTime - Date.now()) // Pour ne pas être en dessous de zéro
     io.emit("updateElementStates", elementStates)
 }
 
@@ -107,6 +115,22 @@ const resetCount = () => {
     elementStates.remainingTime = duration
     elementStates.endTime = Date.now() + elementStates.remainingTime
     io.emit("updateElementStates", elementStates)
+}
+
+const endGame = () => {
+    pauseCount()
+    isSteal = false
+    elementStates.currentQuestion = ""
+    io.emit("soundOff")
+    setTimeout(function () {
+        resetCount()
+        activeTeam = null
+        io.emit("teamUpdate", { activeTeam })
+        questionIndex = 0
+        selectedQuestions = []
+        elementStates.currentQuestion = ""
+        io.emit("updateElementStates", elementStates)
+    }, 10000)
 }
 
 io.on("connection", (socket) => {
@@ -130,7 +154,7 @@ io.on("connection", (socket) => {
             return
         }
 
-        startCount()
+        startCount() // emet un updateElementStates
 
         if (startTeam == "startA") activeTeam = "A"
         if (startTeam == "startB") activeTeam = "B"
@@ -142,7 +166,7 @@ io.on("connection", (socket) => {
         // elementStates.selectedQuestions = selectedQuestions // on garde les 12
         elementStates.currentQuestion = selectedQuestions[questionIndex]
         io.emit("updateElementStates", elementStates)
-        io.emit("playSound", { trackName: "affrontement" })
+        // io.emit("playSound", { trackName: "affrontement" })
         firstQuestion = 0
     })
 
@@ -183,6 +207,10 @@ io.on("connection", (socket) => {
         elementStates.currentCategory = newCategory
         selectedQuestions = questionSelectorCategory(questions, newCategory)
         elementStates.selectedQuestions = selectedQuestions
+        elementStates.scoreA = 0
+        elementStates.scoreB = 0
+        questionIndex = 0
+        questionIndexTotal = 0
         io.emit("updateElementStates", elementStates)
     })
 
@@ -195,54 +223,156 @@ io.on("connection", (socket) => {
     })
 
     socket.on("decision", ({ decision }) => {
-        if (decision == "wrong" && elementStates.isRunning) {
-            io.emit("playSound", { trackName: "wrong" })
-            io.emit("pauseSound", { trackName: "affrontement" })
-            pauseCount()
-        } else if (decision == "wrong" && !elementStates.isRunning) {
-            io.emit("resumeSound", { trackName: "affrontement" })
-            startCount()
+        if (decision == "right") {
+            if (activeTeam == "A") elementStates.scoreA += 1
+            if (activeTeam == "B") elementStates.scoreB += 1
+            if (elementStates.remainingTime > 0) {
+                startCount()
+            }
             questionIndex++
+            questionIndexTotal++
+            // isSteal = false
+        } else if (decision == "wrong") {
+            if (isSteal) {
+                // main au joueur voleur, chrono arrêté
+                // erreur : on relance le chrono, on passe à la question suivante
+                if (elementStates.remainingTime > 0) {
+                    startCount()
+                }
+                questionIndex++
+                questionIndexTotal++
+                isSteal = false
+            } else {
+                // main au joueur principal, chrono en cours
+                // erreur : on arrête le chrono
+                isSteal = true
+                pauseCount()
+
+                if (questionIndexTotal >= 5 && questionIndexTotal <= 9) {
+                    let scoreDifference = elementStates.scoreA - elementStates.scoreB
+                    let maxGap = maxGaps[questionIndex]
+                    if ((activeTeam === "A" && -scoreDifference >= maxGap) || (activeTeam === "B" && scoreDifference >= maxGap)) {
+                        endGame()
+                    }
+                }
+            }
+        } else if (decision == "steal") {
+            if (activeTeam == "A") elementStates.scoreB += 1 // 2 points pour voler
+            if (activeTeam == "B") elementStates.scoreA += 1
+            setTimeout(() => {
+                if (activeTeam == "A") elementStates.scoreB += 1 // 2 points pour voler
+                if (activeTeam == "B") elementStates.scoreA += 1
+                io.emit("updateElementStates", elementStates)
+            }, 400)
+            if (elementStates.remainingTime > 0) {
+                // io.emit("resumeSound", { trackName: "affrontement" })
+                startCount()
+            }
+
+            questionIndex++
+            questionIndexTotal++
+            isSteal = false
         }
 
-        if (questionIndex < 5 + 1) {
-            if (decision == "right") {
-                if (activeTeam == "A") elementStates.scoreA += 1
-                if (activeTeam == "B") elementStates.scoreB += 1
-                io.emit("playSound", { trackName: "right" })
-                startCount()
-                questionIndex++
-            }
-            if (decision == "steal") {
-                if (activeTeam == "A") elementStates.scoreB += 2 // 2 points pour voler
-                if (activeTeam == "B") elementStates.scoreA += 2
-                io.emit("playSound", { trackName: "right" })
-                io.emit("resumeSound", { trackName: "affrontement" })
-                startCount()
-                questionIndex++
-            }
-            socket.emit("updateElementStates", elementStates)
-        }
-
+        // Question suivante, s'il y en a une
         if (questionIndex < 5) {
             elementStates.currentQuestion = selectedQuestions[questionIndex]
-            io.emit("updateElementStates", elementStates)
+            // io.emit("updateElementStates", elementStates)
         }
 
+        // Cas où il faut arrêter avant
+        // TODO: rendre en compte les situations après vol
+        // TODO: seulement en manche 2
+
+        /*
+
+        if (questionIndexTotal >= 6 && questionIndexTotal <= 10) {
+            let scoreDifference = elementStates.scoreA - elementStates.scoreB
+            let maxGap = maxGaps[questionIndex - 1]
+            if ((activeTeam === "A" && -scoreDifference >= maxGap) || (activeTeam === "B" && scoreDifference >= maxGap)) {
+                endGame()
+            }
+        }
+
+        if (questionIndex == 1) {
+            if (activeTeam == "A") {
+                if (elementStates.scoreB - elementStates.scoreA <= -9) {
+                    endGame()
+                }
+            }
+            if (activeTeam == "B") {
+                if (elementStates.scoreA - elementStates.scoreB <= -9) {
+                    endGame()
+                }
+            }
+        }
+        if (questionIndex == 2) {
+            if (activeTeam == "A") {
+                if (elementStates.scoreB - elementStates.scoreA <= -7) {
+                    endGame()
+                }
+            }
+            if (activeTeam == "B") {
+                if (elementStates.scoreA - elementStates.scoreB <= -7) {
+                    endGame()
+                }
+            }
+        }
+        if (questionIndex == 3) {
+            if (activeTeam == "A") {
+                if (elementStates.scoreB - elementStates.scoreA <= -5) {
+                    endGame()
+                }
+            }
+            if (activeTeam == "B") {
+                if (elementStates.scoreA - elementStates.scoreB <= -5) {
+                    endGame()
+                }
+            }
+        }
+        if (questionIndex == 4) {
+            if (activeTeam == "A") {
+                if (elementStates.scoreB - elementStates.scoreA <= -3) {
+                    endGame()
+                }
+            }
+            if (activeTeam == "B") {
+                if (elementStates.scoreA - elementStates.scoreB <= -3) {
+                    endGame()
+                }
+            }
+        }
         if (questionIndex == 5) {
-            pauseCount()
-            elementStates.currentQuestion = ""
-            io.emit("updateElementStates", elementStates)
-            io.emit("soundOff")
-            setTimeout(function () {
-                resetCount()
-                activeTeam = null
-                io.emit("teamUpdate", { activeTeam })
-                questionIndex = 0
-                selectedQuestions = []
-                elementStates.currentQuestion = ""
-                io.emit("updateElementStates", elementStates)
-            }, 10000)
+            if (activeTeam == "A") {
+                if (elementStates.scoreB - elementStates.scoreA <= -1) {
+                    endGame()
+                }
+            }
+            if (activeTeam == "B") {
+                if (elementStates.scoreA - elementStates.scoreB <= -1) {
+                    endGame()
+                }
+            }
+        }
+
+        */
+
+        // Remet à zéro si la dernière question est passée
+        if (questionIndex == 5) {
+            endGame()
+        }
+
+        io.emit("updateElementStates", elementStates)
+    })
+
+    socket.on("scoreFinale", ({ finaleQuestionIndex, questionResult }) => {
+        elementStates.scoreFinale[finaleQuestionIndex] = questionResult
+        io.emit("updateElementStates", elementStates)
+    })
+
+    socket.on("resetFinale", () => {
+        for (let i = 0; i < 5; i++) {
+            elementStates.scoreFinale[i] = ""
         }
     })
 
@@ -253,15 +383,9 @@ io.on("connection", (socket) => {
         io.emit("updateElementStates", elementStates)
     })
 
-    socket.on("changeElementVisibility", ({ elementId, isVisible }) => {
-        elementStates[elementId] = isVisible
-        io.emit("updateElementStates", elementStates)
-    })
-
     // Gestion des questions #########
 
     socket.on("sendQuestion", (question) => {
-        console.log(question)
         elementStates.currentQuestion = question.question
         io.emit("updateElementStates", elementStates)
     })
@@ -323,6 +447,7 @@ io.on("connection", (socket) => {
                 activeTeam = null
                 io.emit("teamUpdate", { activeTeam })
                 questionIndex = 0
+                questionIndexTotal = 0
                 selectedQuestions = []
                 elementStates.questionListName = fileName
                 elementStates.currentQuestion = ""
@@ -337,21 +462,15 @@ io.on("connection", (socket) => {
     // Gestion du chrono
 
     socket.on("timerEnded", () => {
-        console.log("timer ended")
-        setTimeout(function () {
-            resetCount()
-            io.emit("teamUpdate", { activeTeam: null })
-            questionIndex = 0
-            selectedQuestions = []
-            elementStates.currentQuestion = ""
-            io.emit("updateElementStates", elementStates)
-        }, 5000)
+        console.log("time")
+        elementStates.endTime = Date.now()
+        pauseCount()
     })
 
     // sons
 
     socket.on("playSound", ({ trackName }) => {
-        io.emit("playSound", { trackName })
+        // io.emit("playSound", { trackName })
     })
 })
 
@@ -397,18 +516,31 @@ server.listen(port, () => {
 // TODO - Tout reprendre
 //
 // POUR TESTS JANVIER
-// [] Dissocier écran joueur (avec saisie) et écran plateau
+// [] Super finale ?
+// [x] Dissocier écran joueur (avec saisie) et écran plateau
 // [x] Envoi son sur autres écrans ?
 // [x] Éviter les doubles appuis sur la tablette
-// [] Vols après le chrono
-//      [] Il faut donner le dernière réponse avant le fin des 45 secondes. Si on n'a pas joué toutes les questions, les adversaires les jouent.
+// [x] Vols après le chrono
+//      [x] Il faut donner le dernière réponse avant le fin des 45 secondes. Si on n'a pas joué toutes les questions, les adversaires les jouent.
 // [x] Afficheur de thèmes
-// [] UI finale, avec les thèmes qui se retournent
-//      [] Finale : écran spécial + système de vote
-// [] Afficher règles
-// [] Sound design : fin de manche, victoire en finale, points volés (double gling)
-//      [] bed pour les affrontements, avec un son de fin
-// [] QR code pour url locale ?
+// [?] UI finale, avec les thèmes qui se retournent
+//      [?] Finale : écran spécial + système de vote
+//      [x] Enlever l'affichage des questions 
+//      [x] Afficher les points de la finale
+// [x] Afficher règles
+// [x] Sound design : victoire en finale
+//      [x] bed pour les affrontements, avec un son de fin
+//      [x] double gling
+// [?] QR code pour url locale ?
+// [x] Vider la question quand on change de manche
+// [x] Afficher le +2 en deux temps
+// [x] Bouton restart
+// [?] Afficher no de question
+// [?] Afficher Manche 1 / Manche 2 / ...
+// [x] Problème de fin de chrono
+// [x] Reset score auto
+// [x] Baisser le son suspense
+// [] Reprendre tous les TODO du code
 
 //
 // [x] Garder l'état de la manche actuelle côté serveur

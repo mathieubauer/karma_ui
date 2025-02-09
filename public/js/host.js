@@ -2,14 +2,6 @@ import socket from "./components/socket.js"
 import { buildScoreBoard, updateScores } from "./components/score.js"
 import { buildCountdown, startCountdown, pauseCountdown } from "./components/countdown.js"
 
-socket.on("chronoUpdate", ({ endTime, isRunning }) => {
-    if (isRunning) {
-        startCountdown(endTime)
-    } else {
-        pauseCountdown(endTime)
-    }
-})
-
 socket.on("teamUpdate", ({ activeTeam }) => {
     document.querySelectorAll(".start").forEach((button) => {
         button.classList.remove("btn-outline-primary")

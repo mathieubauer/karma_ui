@@ -42,30 +42,6 @@ function updateScores(scoreA, scoreB) {
     if (teamBScoreElement) {
         teamBScoreElement.innerHTML = scoreB
     }
-
-    /*
-    if (teamAScoreElement) {
-        teamAScoreElement.innerHTML = ""
-    }
-    if (teamBScoreElement) {
-        teamBScoreElement.innerHTML = ""
-    }
-
-    for (let i = 0; i < scoreA; i++) {
-        const point = document.createElement("div")
-        point.classList.add("point", "rounded-circle", "bg-success", "m-1")
-        point.style.height = "20px"
-        point.style.width = "20px"
-        document.querySelector("#teamA .score").appendChild(point)
-    }
-    for (let i = 0; i < scoreB; i++) {
-        const point = document.createElement("div")
-        point.classList.add("point", "rounded-circle", "bg-success", "m-1")
-        point.style.height = "20px"
-        point.style.width = "20px"
-        document.querySelector("#teamB .score").appendChild(point)
-    }
-    */
 }
 
 export { buildScoreBoard, updateScores }

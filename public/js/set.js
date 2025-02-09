@@ -7,12 +7,13 @@ import { buildPseudoInput } from "./components/pseudo.js"
 import { buildBuzzer } from "./components/buzzer.js"
 import ElementBuilder from "./components/ElementBuilder.js"
 import { buildCategoryBoard } from "./components/category.js"
+import { buildFinaleScoreBoard, updateFinaleScores } from "./components/finale.js"
 
 const page = document.querySelector(".mainContainer")
 
 // Déclaration des sons
 const audioBuzz = new Audio("../sound/hit_01.mp3")
-const audioBed = new Audio("../sound/affrontement_45v2.mp3") // affrontement_v2 : suspense pour choix
+const audioBed = new Audio("../sound/affrontement__45.mp3") // affrontement_v2 : suspense pour choix
 const audioGenerique = new Audio("../sound/generique_karma.m4a")
 const audioSuspense = new Audio("../sound/suspense.mp3")
 const audioFinale = new Audio("../sound/finale_full.mp3") // ex finale_long.mp3
@@ -77,7 +78,6 @@ socket.on("updateElementStates", (elementStates) => {
         return
     }
 
-    // console.log(elementStates)
     localElementStates = elementStates
     page.innerHTML = ""
 
@@ -87,12 +87,6 @@ socket.on("updateElementStates", (elementStates) => {
     }
 
     if (elementStates.round || elementStates.round == 0) {
-        if (elementStates.round == 11) {
-            // Round 1 avec buzzers
-            page.appendChild(buildBuzzer(elementStates))
-            return
-        }
-
         if (elementStates.round == 2) {
             page.appendChild(buildCountdown(elementStates.remainingTime))
             if (elementStates.isRunning) {
@@ -105,6 +99,7 @@ socket.on("updateElementStates", (elementStates) => {
             if (elementStates.currentCategory) {
                 document.querySelector("#question-category").textContent = categoryMap[elementStates.currentCategory]
             }
+            console.log(elementStates.currentQuestion)
             showQuestion(elementStates.currentQuestion)
 
             page.appendChild(buildScoreBoard())
@@ -121,12 +116,13 @@ socket.on("updateElementStates", (elementStates) => {
             return
         }
 
-        if (elementStates.round == 3 || elementStates.round == 12) {
+        if (elementStates.round == 12) {
             // finale ou affichage des questions en manche 1
             // playOrPause(audioFinale)
             // audioFinale.play()
             const fullPage = new ElementBuilder("div")
                 .setId("fullPageContainer") //
+                .addClass("flex-column")
                 .addChild(buildQuestionContainer())
                 .build()
             page.appendChild(fullPage)
@@ -134,6 +130,26 @@ socket.on("updateElementStates", (elementStates) => {
                 document.querySelector("#question-category").textContent = categoryMap[elementStates.currentCategory]
             }
             showQuestion(elementStates.currentQuestion)
+            return
+        }
+
+        if (elementStates.round == 3) {
+            // finale ou affichage des questions en manche 1
+            // playOrPause(audioFinale)
+            // audioFinale.play()
+            const fullPage = new ElementBuilder("div")
+                .setId("fullPageContainer") //
+                .addClass("flex-column")
+                .addChild(buildQuestionContainer())
+                .addChild(buildFinaleScoreBoard())
+                .build()
+            page.appendChild(fullPage)
+            if (elementStates.currentCategory) {
+                document.querySelector("#question-category").textContent = categoryMap[elementStates.currentCategory]
+            }
+
+            showQuestion(elementStates.currentQuestion)
+            updateFinaleScores(elementStates.scoreFinale)
             return
         }
     }
@@ -149,14 +165,6 @@ socket.on("updateElementStates", (elementStates) => {
 })
 
 // #####
-
-socket.on("chronoUpdate", ({ isRunning, remainingTime, endTime }) => {
-    if (isRunning) {
-        startCountdown(endTime)
-    } else {
-        pauseCountdown(remainingTime)
-    }
-})
 
 socket.on("questionUpdate", ({ question }) => {
     showQuestion(question)

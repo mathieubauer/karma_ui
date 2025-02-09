@@ -49,7 +49,6 @@ function startCountdown(endTime) {
         if (remainingTime <= 0) {
             clearInterval(countdownInterval)
             remainingTime = 0
-            // console.log("fini")
             socket.emit("timerEnded")
         }
 

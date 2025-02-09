@@ -44,14 +44,19 @@
             <div class="row">
 
                 <div class="col-md-2 text-start">
-                    {{!-- <h1 class="fs-4">Accueil</h1> --}}
+
+                    <div id="accueilNotes" class="mb-3" style="font-size: 0.7rem;"></div>
+
+                    {{! <div id="qrcode" style="width: 100%; aspect-ratio: 1 / 1;" class="p-3 bg-white mb-3"></div> }}
+
+                    {{! <h1 class="fs-4">Accueil</h1> }}
                     <button type="button" id="display_empty" class="roundButton btn p-2 text-uppercase fw-bold">Logo</button>
                     <div class="form-check form-switch mt-3">
                         <input class="form-check-input" type="checkbox" role="switch" id="togglePseudo" />
                         <label class="form-check-label" for="togglePseudo">Pseudo</label>
                     </div>
                     <button type="button" id="playGenerique" class="btn btn-secondary btn-sm m-2 p-2 text-uppercase fw-bold">Générique (G)</button>
-                    <button type="button" id="playSting" class="btn btn-secondary btn-sm m-2 p-2 text-uppercase fw-bold">Sting (H)</button>
+                    <button type="button" class="playSting btn btn-secondary btn-sm m-2 p-2 text-uppercase fw-bold">Sting (H)</button>
                 </div>
 
                 <div class="col-md-5 text-start">
@@ -89,19 +94,28 @@
             <div class="row">
 
                 <div class="col-md-2 text-start">
-                    {{!-- <h1 class="fs-4">Manche 1</h1> --}}
-                    <button type="button" id="display_round1" class="roundButton btn p-2 text-uppercase fw-bold mb-2">Buzzers</button>
-                    <button type="button" id="display_round1_questions" class="roundButton btn p-2 text-uppercase fw-bold mb-2">Questions</button>
+
+                    <div id="roundOneNotes" class="mb-3" style="font-size: 0.7rem;"></div>
+
+                    <button type="button" class="playSting btn btn-secondary btn p-2 text-uppercase fw-bold">Sting (H)</button>
+
+                    <hr />
+
+                    <button type="button" id="display_round1" class="roundButton btn btn-secondary p-2 text-uppercase fw-bold mb-2">
+                        M1 Buzzers</button>
+                    <button
+                        type="button"
+                        id="display_round1_questions"
+                        class="roundButton btn btn-secondary p-2 text-uppercase fw-bold mb-2"
+                    >M1 Questions seules</button>
+                    <button
+                        type="button"
+                        id="display_round1_questions_text"
+                        class="roundButton btn btn-secondary p-2 text-uppercase fw-bold mb-2"
+                    >M1 Questions input</button>
                 </div>
 
                 <div class="col-md-10 text-start">
-
-                    <div class="d-flex align-items-center mb-2">
-                        <button type="button" id="activateBuzzerBtn" class="btn btn-secondary p-2 text-uppercase fw-bold">
-                            Activer les buzzers
-                        </button>
-                        <div id="buzzResultsContainer" class="ms-4"></div>
-                    </div>
 
                     <button type="button" id="requestQuestion" class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
                         Question au hasard
@@ -114,9 +128,19 @@
                         </tr>
                     </table>
 
-                    <button type="button" id="sendQuestion" class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
-                        Envoyer la question
-                    </button>
+                    <div class="d-flex align-items-center mb-2">
+                        <button type="button" id="activateBuzzerBtn" class="btn btn-secondary p-2 text-uppercase fw-bold">
+                            Activer les buzzers
+                        </button>
+                        <div id="buzzResultsContainer" class="ms-4"></div>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-2">
+                        <button type="button" id="sendQuestion" class="btn btn-secondary mb-2 p-2 text-uppercase fw-bold">
+                            Envoyer la question
+                        </button>
+                        <div id="answersList" class="ms-4"></div>
+                    </div>
 
                     <div id="allQuestionsContainerRound1"></div>
 
@@ -133,13 +157,19 @@
             <div class="row">
 
                 <div class="col-md-2 text-start">
+                    <div id="manche2choixNotes" class="mb-3" style="font-size: 0.7rem;"></div>
+                    <button type="button" class="playSting btn btn-secondary btn-sm p-2 text-uppercase fw-bold">Sting (H)</button>
+                </div>
+
+                <div class="col-md-2 text-start">
+                    <div id="manche2choixNotes2" class="mb-3" style="font-size: 0.7rem;"></div>
                     <button type="button" id="display_round2_choices" class="roundButton btn mb-2 p-2 text-uppercase fw-bold">
                         Thèmes
                     </button>
                 </div>
 
-                <div class="col-md-10 text-start">
-                    <div id="categoryButtonsToDisplay"></div>
+                <div class="col-md-8 text-start">
+                    <div id="categoryButtonsToDisplay" class="d-flex flex-column"></div>
                 </div>
 
             </div>
@@ -153,10 +183,15 @@
             <div class="row">
 
                 <div class="col-md-2 text-start">
-                    {{!-- <h1 class="fs-4">Manche 2</h1> --}}
+                    <div id="manche2affNotes" class="mb-3" style="font-size: 0.7rem;"></div>
+                    {{! <h1 class="fs-4">Manche 2</h1> }}
                     <button type="button" id="display_round2" class="roundButton btn mb-2 p-2 text-uppercase fw-bold">Manche 2</button>
                     <br />
-                    <button type="button" id="playGameBed" class="btn btn-outline-secondary btn-sm mb-2 p-2 text-uppercase fw-bold">Affrontement (Space)</button>
+                    <button
+                        type="button"
+                        id="playGameBed"
+                        class="btn btn-outline-secondary btn-sm mb-2 p-2 text-uppercase fw-bold"
+                    >Affrontement (Space)</button>
                 </div>
 
                 <div class="col-md-10 text-start">
@@ -215,7 +250,8 @@
             <div class="row">
 
                 <div class="col-md-2 text-start">
-                    {{!-- <h1 class="fs-4">Manche 2 - Éliminations</h1> --}}
+                    <div id="manche2elimNotes" class="mb-3" style="font-size: 0.7rem;"></div>
+                    {{! <h1 class="fs-4">Manche 2 - Éliminations</h1> }}
                     <button type="button" id="playSuspense" class="btn btn-secondary btn-sm mb-2 p-2 text-uppercase fw-bold">Suspense (C)</button>
                 </div>
 
@@ -223,10 +259,10 @@
 
                     <div>
                         {{#each questionsElim}}
-                            <div class="my-2">
+                            <div class="mb-3">
                                 <span>{{question}}</span>
                                 <br />
-                                <span class="fw-bold">{{answer}}</span>
+                                <span class="text-secondary">{{answer}}</span>
                             </div>
                         {{/each}}
                     </div>
@@ -243,7 +279,8 @@
             <div class="row">
 
                 <div class="col-md-2 text-start">
-                    <h1 class="fs-4">Finale</h1>
+                    {{! <h1 class="fs-4">Finale</h1> }}
+                    <div id="finaleNotes" class="mb-3" style="font-size: 0.7rem;"></div>
                 </div>
 
                 <div class="col-md-10 text-start">
@@ -260,6 +297,14 @@
                     <button type="button" id="playFinaleLose" class="btn btn-secondary btn-sm me-2 mb-2 p-2 text-uppercase fw-bold">
                         Finale Lose (N)
                     </button>
+
+                    <br />
+
+                    <div id="finaleButtons"></div>
+
+                    <br />
+
+                    <div id="displayFinaleScore"></div>
 
                     <div id="questionsFinale">
                         {{#each questionsFinale}}
@@ -305,4 +350,5 @@
 -->
 
 <script src="/socket.io/socket.io.js"></script>
+<script src="/js/components/qrcode.min.js"></script>
 <script type="module" src="/js/real.js"></script>
