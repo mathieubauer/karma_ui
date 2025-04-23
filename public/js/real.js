@@ -154,7 +154,7 @@ socket.on("updateElementStates", (elementStates) => {
     }
 
     if (elementStates.activePlayer !== undefined) {
-        document.getElementById("buzzResultsContainer").innerHTML = elementStates.activePlayer
+        document.getElementById("infoReal").innerHTML = elementStates.activePlayer
     }
 
     // FINALE
@@ -431,7 +431,7 @@ socket.on("connectedPlayers", (players) => {
 socket.on("playerAnswer", ({ pseudo, answer }) => {
     const span = document.createElement("span")
     span.innerHTML = `${pseudo}: ${answer.answer} <br>`
-    document.getElementById("answersList").appendChild(span)
+    document.getElementById("infoReal").appendChild(span)
 })
 
 // Request / receive random question #####
@@ -512,26 +512,31 @@ function handleKeyDown(event) {
         letter = event.key.toUpperCase()
     }
 
-    // BUZZ
-    if (
-        letter == "Q" ||
-        letter == "W" ||
-        letter == "E" ||
-        letter == "R" ||
-        letter == "T" ||
-        letter == "Y" ||
-        letter == "U" ||
-        letter == "I" ||
-        letter == "O" ||
-        letter == "P" ||
-        letter == "A" ||
-        letter == "S" ||
-        letter == "D"
-        // 13ème ?
-    ) {
+    // Map des touches de buzzer vers le numéro de joueur
+    const buzzMap = {
+        Q: "Joueur 1",
+        W: "Joueur 2",
+        E: "Joueur 3",
+        R: "Joueur 4",
+        T: "Joueur 5",
+        Y: "Joueur 6",
+        U: "Joueur 7",
+        I: "Joueur 8",
+        O: "Joueur 9",
+        P: "Joueur 10",
+        A: "Joueur 11",
+        S: "Joueur 12",
+        D: "Joueur 13",
+    }
+
+    const player = buzzMap[letter]
+    if (player) {
         stopSound(audioBed)
         stopSound(audioSuspense)
         audioBuzz.play()
+        const spanBuzz = document.createElement("span")
+        spanBuzz.innerHTML = `Buzz: ${player} <br>`
+        document.getElementById("infoReal").appendChild(spanBuzz)
         setTimeout(() => {
             document.querySelector("body").classList.replace("bg-dark", "bg-warning")
             setTimeout(() => {

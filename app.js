@@ -133,6 +133,23 @@ const endGame = () => {
     }, 10000)
 }
 
+/**
+ * Vérifie si l'écart est insurmontable et termine la manche si besoin.
+ */
+function checkEndgame() {
+    // TODO, à revoir
+    if (questionIndexTotal >= 5) {
+        const remainingQuestions = 10 - questionIndexTotal;
+        const scoreDifference = Math.abs(elementStates.scoreA - elementStates.scoreB);
+        // Chaque question restante peut rapporter 2 points en cas de vol
+        const maxPointsLeft = remainingQuestions * 2;
+        if (scoreDifference > maxPointsLeft) {
+            endGame();
+        }
+    }
+}
+
+
 io.on("connection", (socket) => {
     socket.on("getElementStates", () => {
         socket.emit("updateElementStates", elementStates)
@@ -247,14 +264,6 @@ io.on("connection", (socket) => {
                 // erreur : on arrête le chrono
                 isSteal = true
                 pauseCount()
-
-                if (questionIndexTotal >= 5 && questionIndexTotal <= 9) {
-                    let scoreDifference = elementStates.scoreA - elementStates.scoreB
-                    let maxGap = maxGaps[questionIndex]
-                    if ((activeTeam === "A" && -scoreDifference >= maxGap) || (activeTeam === "B" && scoreDifference >= maxGap)) {
-                        endGame()
-                    }
-                }
             }
         } else if (decision == "steal") {
             if (activeTeam == "A") elementStates.scoreB += 1 // 2 points pour voler
@@ -282,80 +291,9 @@ io.on("connection", (socket) => {
 
         // Cas où il faut arrêter avant
         // TODO: rendre en compte les situations après vol
-        // TODO: seulement en manche 2
-
-        /*
-
-        if (questionIndexTotal >= 6 && questionIndexTotal <= 10) {
-            let scoreDifference = elementStates.scoreA - elementStates.scoreB
-            let maxGap = maxGaps[questionIndex - 1]
-            if ((activeTeam === "A" && -scoreDifference >= maxGap) || (activeTeam === "B" && scoreDifference >= maxGap)) {
-                endGame()
-            }
-        }
-
-        if (questionIndex == 1) {
-            if (activeTeam == "A") {
-                if (elementStates.scoreB - elementStates.scoreA <= -9) {
-                    endGame()
-                }
-            }
-            if (activeTeam == "B") {
-                if (elementStates.scoreA - elementStates.scoreB <= -9) {
-                    endGame()
-                }
-            }
-        }
-        if (questionIndex == 2) {
-            if (activeTeam == "A") {
-                if (elementStates.scoreB - elementStates.scoreA <= -7) {
-                    endGame()
-                }
-            }
-            if (activeTeam == "B") {
-                if (elementStates.scoreA - elementStates.scoreB <= -7) {
-                    endGame()
-                }
-            }
-        }
-        if (questionIndex == 3) {
-            if (activeTeam == "A") {
-                if (elementStates.scoreB - elementStates.scoreA <= -5) {
-                    endGame()
-                }
-            }
-            if (activeTeam == "B") {
-                if (elementStates.scoreA - elementStates.scoreB <= -5) {
-                    endGame()
-                }
-            }
-        }
-        if (questionIndex == 4) {
-            if (activeTeam == "A") {
-                if (elementStates.scoreB - elementStates.scoreA <= -3) {
-                    endGame()
-                }
-            }
-            if (activeTeam == "B") {
-                if (elementStates.scoreA - elementStates.scoreB <= -3) {
-                    endGame()
-                }
-            }
-        }
-        if (questionIndex == 5) {
-            if (activeTeam == "A") {
-                if (elementStates.scoreB - elementStates.scoreA <= -1) {
-                    endGame()
-                }
-            }
-            if (activeTeam == "B") {
-                if (elementStates.scoreA - elementStates.scoreB <= -1) {
-                    endGame()
-                }
-            }
-        }
-
-        */
+        // Vérification de fin anticipée après mise à jour des scores
+        // TODO: à revoir
+        // checkEndgame()
 
         // Remet à zéro si la dernière question est passée
         if (questionIndex == 5) {
@@ -593,3 +531,6 @@ server.listen(port, () => {
 // [] Pouvoir modifier la question à la volée en cas de problème
 // [] Afficher les scores de chaque joueur (show Leaderboard)
 // [] Conserver la liste des réponses et des points on refresh
+// [] Questions ouvertes  
+//      [] Garder l'historique des réponses
+//      [] Supprimer les affichages des réponses à chaque changement de question

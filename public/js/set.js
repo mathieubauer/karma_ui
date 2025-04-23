@@ -116,8 +116,13 @@ socket.on("updateElementStates", (elementStates) => {
             return
         }
 
-        if (elementStates.round == 12) {
-            // finale ou affichage des questions en manche 1
+        if (elementStates.round == 11) {
+            // Round 1 avec buzzers
+            return
+        }
+
+        if (elementStates.round == 12 || elementStates.round == 13) {
+            // affichage des questions en manche 1 (sans zone de saisie onSet)
             // playOrPause(audioFinale)
             // audioFinale.play()
             const fullPage = new ElementBuilder("div")

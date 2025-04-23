@@ -21,6 +21,10 @@ function buildAnswerInputContainer() {
 
     const answerInput = new ElementBuilder("input")
         .setAttribute("type", "text")
+        .setAttribute("autocomplete", "off")
+        .setAttribute("autocorrect", "off")
+        .setAttribute("autocapitalize", "off")
+        .setAttribute("spellcheck", "false")
         .setId("answerInput")
         .addClass("form-control mt-3 text-center w-100")
         .setAttribute("placeholder", "Votre réponse")
